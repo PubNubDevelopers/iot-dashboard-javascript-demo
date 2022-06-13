@@ -1,5 +1,5 @@
-const publish_key = 'pub-c-76bc5dff-cd00-4c1a-9360-f750e213331b';     //  ENTER YOUR PUBLISH KEY HERE
-const subscribe_key = 'sub-c-8f498a3e-8ef4-4373-913a-95aeb73fd21d';   //  ENTER YOUR SUBSCRIBE KEY HERE
+const publish_key = '';     //  ENTER YOUR PUBLISH KEY HERE
+const subscribe_key = '';   //  ENTER YOUR SUBSCRIBE KEY HERE
 
 function createPubNubObject(presetUUID)
 {
