@@ -1,0 +1,32 @@
+{
+  "name": "iot-javascript-demo",
+  "version": "1.0.0",
+  "description": "Application to demonstrate the real time capabilities of PubNub with IoT solutions",
+  "main": "index.js",
+  "scripts": {
+    "watch": "nodemon",
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/darryncampbell-pubnub/iot-javascript-demo.git"
+  },
+  "keywords": [
+    "IoT",
+    "PubNub",
+    "Subscribe",
+    "Publish"
+  ],
+  "author": "Darryn Campbell (PubNub)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/darryncampbell-pubnub/iot-javascript-demo/issues"
+  },
+  "homepage": "https://github.com/darryncampbell-pubnub/iot-javascript-demo#readme",
+  "dependencies": {
+    "express": "^4.18.1",
+    "nodemon": "^2.0.16",
+    "reload": "^3.2.0"
+  }
+}
