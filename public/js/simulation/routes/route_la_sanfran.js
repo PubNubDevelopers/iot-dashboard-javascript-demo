@@ -1,4 +1,4 @@
-var route_i5_flip = {"coords" : [
+var route_coords = {"coords" : [
     {"lat":34.05462,"long":-118.23982},
     {"lat":34.05904,"long":-118.24567},
     {"lat":34.06164,"long":-118.24865},

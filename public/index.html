@@ -2,12 +2,11 @@
 <html lang="en">
 
 <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,
 		initial-scale=1, shrink-to-fit=no" />
 
-    <!-- Bootstrap CSS -->
+    <!-- Bootstrap and FontAwesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
     <link rel="stylesheet" href="./style.css" />
@@ -16,18 +15,29 @@
     <script>
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
+            return new bootstrap.Tooltip(tooltipTriggerEl)
         })
     </script>
 
-    <!-- PubNub -->
+    <!-- PubNub SDK -->
     <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.7.0.1.min.js"></script>
+
+    <!-- Application logic -->
+    <script src="./js/device_create.js"></script>
+    <script src="./js/device_edit.js"></script>
+    <script src="./js/simulation/simulation.js"></script>
+    <script src="./js/simulation/simulator_types.js"></script>
+    <script src="./js/pubnub_setup.js"></script>
+
+    <!-- Interactive Demo Framework -->
+    <script src="./js/demo/demo_interface.js"></script>
 </head>
 
 <body id="body" onload="onload();">
     <script src="/reload/reload.js"></script>
     <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
 
+        <!-- Nav Bar (simulated) -->
         <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur"
             navbar-scroll="true">
             <div class="container-fluid py-1 px-3">
@@ -37,13 +47,10 @@
                         <li class="breadcrumb-item text-sm active" aria-current="page">IoT Dashboard</li>
                     </ol>
                 </nav>
-
                 <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
                     <div class="ms-md-auto pe-md-2 d-flex align-items-center">
-
                     </div>
                     <ul class="navbar-nav  justify-content-end">
-
                         <li class="nav-item d-flex align-items-center">
                             <a href="javascript:;" class="nav-link text-body font-weight-bold px-0">
                                 <i class="fa fa-user me-sm-1"></i>
@@ -54,13 +61,22 @@
             </div>
         </nav>
 
+        <!-- 'Header' -->
         <div class="container">
             <div class="text-center">
                 <H1>PubNub IoT Demo</H1>
-
+                <div class="alert alert-primary align-items-center" id="loadWarning" role="alert">
+                    <div class="text-center fs-4">
+                        Clearing previous devices. Creating simulated Devcies
+                        <div class="spinner-border float-end" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
+        <!-- Shown if no PubNub keys found in setup.js -->
         <div class="container alert alert-danger alert-dismissible fade show" style="display:none" id="noKeysAlert"
             role="alert">
             <i class="fa-solid fa-triangle-exclamation"></i>
@@ -68,10 +84,11 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
 
+        <!--  Main app body -->
         <div class="container-fluid px-2">
             <div class="row gy-2 px-2">
-                <div class="col-lg-9 col-md-8 px-2">
-                    <div style="height:100%;min-height: 400px;max-height: 800px;" id="map-canvas">.</div>
+                <div class="col-lg-8 col-md-8 px-2">
+                    <div style="height:100%;height: 800px;" id="map-canvas">.</div>
                 </div>
                 <div class="col">
                     <div class="row gy-2 px-2">
@@ -79,16 +96,24 @@
                             <div class="card text-dark mb-3" style="width:100%;">
                                 <div class="card-body bg-light">
                                     <h5 class="card-title text-center" id="selected-name">Please Select a Device</h5>
-                                    <p class="card-text small" id="selected-id">ID:</p>
+                                    <span class="card-text small fw-bold">ID:</span>
+                                    <span class="card-text small" id="selected-id"></span>
+                                    <span class="float-end">
+                                        <span class="card-text small fw-bold">PubNub Channel Name: </span>
+                                        <span class="card-text small" id="selected-channel-name"></span>
+                                    </span>
                                 </div>
                                 <ul class="list-group list-group-flush">
                                     <li class="list-group-item" id="selected-location">Location: </li>
                                     <li class="list-group-item" id="selected-sensor-name">Sensor: </li>
                                     <li class="list-group-item" id="selected-sensor-value">Reading</li>
-                                    <li class="list-group-item" id="selected-sensor-update-frequency">Sensor Update Frequency</li>
+                                    <li class="list-group-item" id="selected-sensor-update-frequency">Update Frequency:
+                                    </li>
+                                    <li class="list-group-item" id="selected-last-seen">Last Seen: </li>
                                     <li class="list-group-item" id="selected-firmware">Firmware</li>
                                 </ul>
-                                <a href="#" class="btn btn-danger">Delete Device</a>
+                                <a href="javascript:deleteDevice(selectedId);" class="btn btn-danger"
+                                    id="selected-delete-device" style="display:none">Delete Device</a>
                             </div>
 
 
@@ -99,29 +124,22 @@
                                     <div class="card-body">
                                         <h5 class="card-title text-center">Registered Devices</h5>
                                     </div>
-                                    <a href="#" class="btn btn-info">Create New Device</a>
-                                    <ul class="list-group list-group-flush" id="registeredDevicesList">                                    
+                                    <a href="javascript:createNewDevice();" class="btn btn-info">Create New Device</a>
+                                    <ul class="list-group list-group-flush" id="registeredDevicesList">
                                     </ul>
                                 </div>
-
-
                             </div>
-
-
                         </div>
-
                     </div>
                 </div>
             </div>
         </div>
 
-
-
-
+        <!-- Footer -->
         <footer class="footer pt-3  ">
             <div class="container-fluid">
                 <div class="row align-items-center justify-content-lg-between">
-                    <div class="col-lg-6 mb-lg-0 mb-4">
+                    <div class="col-lg-3 mb-lg-0 mb-4">
                         <div class="copyright text-center text-sm text-muted text-lg-start">
                             ©
                             <script>
@@ -130,6 +148,8 @@
                         </div>
                     </div>
                     <div class="col-lg-6">
+                    </div>
+                    <div class="col-lg-3">
                         <ul class="nav nav-footer justify-content-center justify-content-lg-end">
                             <li class="nav-item">
                                 <a href="https://www.pubnub.com" class="nav-link text-muted"
@@ -140,6 +160,130 @@
                 </div>
             </div>
         </footer>
+
+        <!--  Modal: Edit Device -->
+        <div class="modal" id="editModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content p-2">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalTitle">Edit Device: </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="small mb-3"><span>ID: </span><span id="editModalDeviceId"></span></div>
+                        <div class="mb-3">
+                            <label for="editModalDeviceName" class="form-label">Device Name</label>
+                            <input type="text" class="form-control" placeholder="placeholder" id="editModalDeviceName">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editModalIntervalRange" class="form-label"
+                                id="editModalIntervalRangeLabel">Sensor Reporting Interval: </label>
+                            <input type="range" class="form-range" min="1000" max="60000" step="1000"
+                                id="editModalIntervalRange">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editModalUpdateFirmwareFile" class="form-label">Update Device Firmware</label>
+                            <input class="form-control" type="file" id="editModalUpdateFirmwareFile">
+                            <div class="mt-3 text-end">
+                                <button type="button" class="btn btn-outline-primary"
+                                    id="editModalUpdateFirmware">Update Firmware (& Reboot)</button>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-warning " id="editModalReboot">Reboot Device</button>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close without
+                            Saving</button>
+                        <button type="button" class="btn btn-primary" id="editModalSaveChanges"
+                            onclick="editModalSaveChanges()">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Edit Device -->
+        <div class="modal" id="createModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content p-2">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Create New Device</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                            This simulated device will only exist in the current tab (See ReadMe). <strong>This is a
+                                limitation of this demo, not a limitation of PubNub.</strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        <div class="alert alert-warning fade show" role="alert" id="createDeviceValidationDialog"
+                            style="display:none">
+                            <strong>Validation Issue:</strong><br>
+                            <span id='createDeviceValidationWarning'></span>
+                        </div>
+                        <div class="small mb-3"><span>ID: </span><span id="createModalDeviceId"></span></div>
+                        <div class="mb-3">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="createDeviceReal"
+                                    id="createDeviceReal" disabled>
+                                <label class="form-check-label" for="createDeviceReal">
+                                    Real Device
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="createDeviceSim" id="createDeviceSim"
+                                    checked>
+                                <label class="form-check-label" for="createDeviceSim">
+                                    Local, Simulated Device
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="createModalDeviceName" class="form-label">Device Name</label>
+                            <input type="text" class="form-control" placeholder="Specify a Device Name"
+                                id="createModalDeviceName">
+                        </div>
+                        <div class="mb-3">
+                            <label for="createModalSelectSensorType" class="form-label">Type of Sensor:</label>
+                            <select class="form-select" id="createModalSelectSensorType">
+                                <option selected>Select Sensor Type</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="createModalSelectRoute" class="form-label">Route for Device to Follow:</label>
+                            <select class="form-select" id="createModalSelectRoute">
+                                <option selected>Select Route:</option>
+                            </select>
+                        </div>
+                        <div class="mb-3" style="display:none" id="createDeviceLatLongPair">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col p-1">
+                                        <div class="form-floating">
+                                            <input type="number" class="form-control" id="createDeviceLat"
+                                                placeholder="" value="">
+                                            <label for="createDeviceLat">Latitude:</label>
+                                        </div>
+                                    </div>
+                                    <div class="col p-1">
+                                        <div class="form-floating">
+                                            <input type="number" class="form-control" id="createDeviceLong"
+                                                placeholder="" value="">
+                                            <label for="createDeviceLong">Longitude:</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="Create Device"
+                            onclick="createModalCreateDevice()">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </main>
 
@@ -156,180 +300,20 @@
         crossorigin="anonymous"></script>
 
     <!-- Application logic -->
+    <script src="./js/pubnub_handler.js"></script>
+    <script src="./js/table_ui.js"></script>
     <script src="./js/map.js"></script>
     <script>
+        //  Map
         var jsElem = window.document.createElement('script');
         jsElem.src = "https://maps.googleapis.com/maps/api/js?key=" + GOOGLE_MAP_KEY + "&callback=initialize";
         jsElem.type = 'text/javascript';
         document.getElementById('body').append(jsElem);
-    </script>
-    <script src="./js/simulation/simulation.js"></script>
-    <script src="./js/simulation/types.js"></script>
-    <script src="./js/pubnub_setup.js"></script>
-    <script>
-        var pubnub = null;
-        const channelGroupAllDevices = 'cg_iot_all';
-        var iotDevices = null;
-        var selectedId = null;
 
-        async function onload()
-        {
-            iotDevices = {};
-            if (!testPubNubKeys()) {
-                document.getElementById("noKeysAlert").style.display = "block";
-            }
-            else{
-                pubnub = createPubNubObject();
-                await pubnub.addListener({
-                    status: async (statusEvent) => {
-                        //console.log(statusEvent);
-                        //  Channel group subscription is now complete, pre-populate with simulators.
-                        if (statusEvent.affectedChannelGroups[0] === channelGroupAllDevices)
-                        {
-                            testing();
-                        }
-                    },
-                    message: async (payload) => {
-                        //  todo: Populate state of associated object (iotDevices)
-                        //  todo: trigger update of selected device table
-                        console.log(payload);
-                        iotDevices[payload.publisher].name = payload.message.friendly_name;
-                        iotDevices[payload.publisher].lat = payload.message.lat;
-                        iotDevices[payload.publisher].long = payload.message.long;
-                        iotDevices[payload.publisher].sensors[0].sensor_name = payload.message.sensors[0].sensor_name;
-                        iotDevices[payload.publisher].sensors[0].sensor_value = Math.round((payload.message.sensors[0].sensor_value + Number.EPSILON) * 100) / 100;
-                        iotDevices[payload.publisher].sensors[0].sensor_update_frequency = payload.message.sensors[0].sensor_update_frequency;
-                        iotDevices[payload.publisher].sensors[0].sensor_units = payload.message.sensors[0].sensor_units;
-                        iotDevices[payload.publisher].firmware_version = payload.message.firmware_version;
-                        moveMapMarker(payload.publisher, populateSelectedDeviceTable);
-                        if (iotDevices[payload.publisher].selected)
-                            populateSelectedDeviceTable(payload.publisher);
-
-                    },
-                    presence: (presenceEvent) => {
-                        //  todo: Check this works for announce interval
-                        if (iotDevices[presenceEvent.uuid])
-                        {
-                            if (presenceEvent.action === 'join')
-                                iotDevices[presenceEvent.uuid].online = 'yes';
-                            else
-                                iotDevices[presenceEvent.uuid].online = 'no';
-                            updateRegisteredDevice(presenceEvent.uuid);
-                        }
-                    }
-                });
-
-
-                const cgSubscibeResult = await pubnub.subscribe({
-                    channelGroups: [channelGroupAllDevices]
-                });
-
-                //  todo Delete this
-                //  Needed to avoid a 400 error in PNSubscribe Operation
-                //const controlSubscirbeRsesult = await pubnub.subscribe({
-                //    channels: ['control'],
-                //    withPresence: true
-                //});
-
-            }
-
-            var ul = document.getElementById('registeredDevicesList');
-            ul.addEventListener('click', registeredDeviceRow_click, true);
-        }
-
-
-        async function testing()
-        {
-            //await createSimulator({'id': "device_test", 'name': "Simulated Device 1", 'type': SensorType.Temperature, 'lat': 37.7749, 'long': -122.4194});
-            var id = '1';
-            await createSimulator(
-                {'id': id,'name': "Simulated Chilled Truck", 'type': SensorType.RefrigeratorTemperature, 'mobility': SensorMobility.Moving, 'lat': 37.77104, 'long': -122.41808}).then (webWorker => {
-                    iotDevices[id].worker = webWorker;
-                });
-            iotDevices[id].worker.postMessage({ action: "start"});
-            
-            var id = '2';
-            await createSimulator(
-                {'id': id,'name': "Simulated Freezer Truck", 'type': SensorType.FreezerTemperature, 'mobility': SensorMobility.Moving, 'lat': 34.05462, 'long': -118.23982}).then (webWorker => {
-                    iotDevices[id].worker = webWorker;
-                });
-            iotDevices[id].worker.postMessage({ action: "start"});
-            
-        }
-
-        
-
-
-            function updateRegisteredDevice(deviceId)
-            {
-                var li_old = document.getElementById(deviceId);
-
-                var li = document.createElement('li');
-                li.setAttribute("class", "list-group-item small cursor-hand");
-                li.setAttribute("id", deviceId);
-                li.innerHTML = registeredDeviceRow(deviceId);
-                li_old.replaceWith(li);
-            }
-
-            function addRegisteredDevice(deviceId)
-            {
-                var ul = document.getElementById('registeredDevicesList');
-                //ul.addEventListener('click', registeredDeviceRow_click, true);
-                var li = document.createElement('li');
-                li.setAttribute("class", "list-group-item small cursor-hand");
-                
-                li.setAttribute("id", deviceId);
-                li.innerHTML = registeredDeviceRow(deviceId);
-                ul.appendChild(li);
-            }
-
-            function registeredDeviceRow(deviceId)
-            {
-                var rubbishBin = "<span style='float:right'><H5><a href='javascript:alert(\"you clicked me\");' style='color:red'><i class='fa-solid fa-trash-can'></i></H5></a></span>";
-                var html = "";
-                var presence = '';
-                if (iotDevices[deviceId].online === 'yes')
-                {
-                    presence += "<span style='color:green;float:right;margin-right:5px' data-bs-toggle='tooltip' data-bs-placement='right' title='Device is Online'><i class='fa-solid fa-circle'></i></span>";
-                }
-                else
-                {
-                    presence += "<span style='color:gray;float:right;margin-right:5px' data-bs-toggle='tooltip' data-bs-placement='right' title='Device is Offline'><i class='fa-regular fa-circle'></i></span>";
-                }
-                html += iotDevices[deviceId].name + ' ';
-                html += rubbishBin + ' ';
-                html += presence + ' ';
-                return html;
-            }
-
-            function registeredDeviceRow_click(e)
-            {
-                if (e !== null && e.target !== null && iotDevices[e.target.id])
-                {
-                    populateSelectedDeviceTable(e.target.id);
-                    focusOnMarker(e.target.id);
-                }
-            }
-
-            function populateSelectedDeviceTable(deviceId)
-            {
-                if (selectedId != null)
-                {
-                    iotDevices[selectedId].selected = false;
-                }
-                iotDevices[deviceId].selected = true;
-                selectedId = deviceId;
-                document.getElementById('selected-name').innerHTML = "Selected: " + iotDevices[deviceId].name;
-                document.getElementById('selected-id').innerHTML = "ID: " + deviceId;
-                document.getElementById('selected-location').innerHTML = "Location: [" + iotDevices[deviceId].lat + ", " + iotDevices[deviceId].long + "]";
-                document.getElementById('selected-sensor-name').innerHTML = "Sensor: " + iotDevices[deviceId].sensors[0].sensor_name;
-                document.getElementById('selected-sensor-value').innerHTML = "Reading: " + iotDevices[deviceId].sensors[0].sensor_value + ' ' + iotDevices[deviceId].sensors[0].sensor_units;
-                document.getElementById('selected-sensor-update-frequency').innerHTML = "Update Frequency: " + iotDevices[deviceId].sensors[0].sensor_update_frequency + "ms";
-                document.getElementById('selected-firmware').innerHTML = "Firmware: " + iotDevices[deviceId].firmware_version;
-            }
-
+        //  Load warning about clearing previous devices - see ReadMe for more information on persistence.
+        var warningMsg = document.getElementById('loadWarning');
+        setTimeout(function () {document.getElementById('loadWarning').style.display = "none"}, 3000);
     </script>
 
 </body>
-
 </html>

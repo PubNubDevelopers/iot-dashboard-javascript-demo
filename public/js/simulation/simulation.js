@@ -1,70 +1,180 @@
-async function createSimulator(args)
-{
-    return new Promise((resolve, reject) => {
+/**
+ * Logic related to creating predefined and user-specified simulators.
+ */
 
-        var simulatorTask = new Worker('./js/simulation/devicesimulator.js');
+var client = null
 
-        simulatorTask.onmessage = async function(event)
-        {
-             if (event.data.command === 'provisionDevice')
-             {
-                //  A NOTE ON PROVISIONING:
-                //  Whilst it may seem silly to assign the simulator an ID and then ask the simulator for the ID it was assigned, the intention is to show that these two pieces of information would usually come from a provisioning server, in production.
-                var channelName = event.data.values.channelName;
-                var deviceId = event.data.values.deviceId;
-                var deviceName = event.data.values.deviceName;
-                //  Add simulator to channel group
-                try {
-                    const controlSubscirbeRsesult = await pubnub.subscribe({
-                        channels: [channelName + '-pnpres'],
-                    });
+async function initializeSimulators () {
+  //  Note: Specify null route for a stationary object
+  var id = 'sim_1'
+  await createSimulator({
+    id: id,
+    name: 'Californian Chilled Truck',
+    type: SensorType.RefrigeratorTemperature,
+    route: Routes.I5NS,
+    lat: Routes.I5NS.startLat,
+    long: Routes.I5NS.startLong
+  }).then(webWorker => {
+    iotDevices[id].worker = webWorker
+  })
+  iotDevices[id].worker.postMessage({ action: 'start' })
 
-                    const result = await pubnub.channelGroups.addChannels({
-                    channels: [channelName],
-                    channelGroup: channelGroupAllDevices
-                });
-                }
-                catch (status) {
-                    console.log("Failed to create channel groups: " + status);
-                }
-                if (!iotDevices[deviceId])
-                {
-                    iotDevices[deviceId] = {'online' :'unknown', 'selected': false, 'name': deviceName, 'channelName': channelName, 'lat': 0.000, 'long': 0.000, 'sensors': [{'sensor_name': '', 'sensor_type': '', 'sensor_update_frequency':5000, 'sensor_value': '', 'sensor_units': '', 'sensor_lastupdate': ''}], 'firmware_version': '1.0.0', 'eaAction': '', 'eaActionTime': '', 'mapMarker': null};
-                    addRegisteredDevice(deviceId);
-                }
-                simulatorTask.postMessage({action: "finalizeProvisioning", params: {sub: subscribe_key, pub: publish_key, mobility: args.mobility}});
-            }
-            else if (event.data.command === 'provisionComplete')
-            {
-                var deviceId = event.data.values.deviceId;
-                await updateDevicePresence(deviceId);
+  var id = 'sim_2'
+  await createSimulator({
+    id: id,
+    name: 'European Freezer Truck',
+    type: SensorType.FreezerTemperature,
+    route: Routes.Eur2,
+    lat: Routes.Eur2.startLat,
+    long: Routes.Eur2.startLong
+  }).then(webWorker => {
+    iotDevices[id].worker = webWorker
+  })
+  iotDevices[id].worker.postMessage({ action: 'start' })
 
-                resolve(simulatorTask);        
-            }
-        }
-        simulatorTask.postMessage({ action: "init", params: {id: args.id, name: args.name, type: args.type, lat: args.lat, long: args.long}});
-    })
+  var id = 'sim_3'
+  await createSimulator({
+    id: id,
+    name: 'Radiation Monitor at HMNB Clyde',
+    type: SensorType.RadiationMonitor,
+    route: null,
+    lat: 56.0674,
+    long: -4.8146
+  }).then(webWorker => {
+    iotDevices[id].worker = webWorker
+  })
+  iotDevices[id].worker.postMessage({ action: 'start' })
 
-    }
+  var id = 'sim_4'
+  await createSimulator({
+    id: id,
+    name: 'Australian mobile Air Quality Monitor',
+    type: SensorType.Air_Pollution,
+    route: Routes.Aus,
+    lat: Routes.Aus.startLat,
+    long: Routes.Aus.startLong
+  }).then(webWorker => {
+    iotDevices[id].worker = webWorker
+  })
+  iotDevices[id].worker.postMessage({ action: 'start' })
 
-    async function updateDevicePresence(deviceId)
-    {
-        //  In the case of page refreshes, update the presence information manually for pre-created simulators
+  var id = 'sim_5'
+  await createSimulator({
+    id: id,
+    name: 'Victoria Falls Wind Speed',
+    type: SensorType.Anemometer,
+    route: null,
+    lat: -17.9257,
+    long: 25.8625
+  }).then(webWorker => {
+    iotDevices[id].worker = webWorker
+  })
+  iotDevices[id].worker.postMessage({ action: 'start' })
+
+  var id = 'sim_6'
+  await createSimulator({
+    id: id,
+    name: 'Transalpine mobile Air Quality Monitor',
+    type: SensorType.Air_Pollution,
+    route: Routes.Eur1,
+    lat: Routes.Eur1.startLat,
+    long: Routes.Eur1.startLong
+  }).then(webWorker => {
+    iotDevices[id].worker = webWorker
+  })
+  iotDevices[id].worker.postMessage({ action: 'start' })
+}
+
+async function createSimulator (args) {
+  return new Promise((resolve, reject) => {
+    var simulatorTask = new Worker('./js/simulation/worker_devicesim.js')
+
+    simulatorTask.onmessage = async function (event) {
+      if (event.data.command === 'provisionDevice') {
+        //  A NOTE ON PROVISIONING:
+        //  Whilst it may seem silly to assign the simulator an ID and then ask the simulator for the ID it was assigned, the intention is to show that these two pieces of information would usually come from a provisioning server, in production.
+        var channelName = event.data.values.channelName
+        var deviceId = event.data.values.deviceId
+        var deviceName = event.data.values.deviceName
+        //  Add simulator to channel group
         try {
-            const result = await pubnub.whereNow({
-                uuid: deviceId,
-            });
-            if (result.channels.length > 0)
-            {
-                //  This device is subscribed to at least one channel
-                if (iotDevices[deviceId])
-                {
-                    iotDevices[deviceId].online = 'yes';
-                    updateRegisteredDevice(deviceId);
-                }
-            }
-        } catch (status) {
-            console.log(status);
-        }
-    }
+          //  Subscribe to presence information for the device, so we will receive presence events
+          const controlSubscirbeRsesult = await pubnub.subscribe({
+            channels: [channelName + '-pnpres']
+          })
 
+          //  Update the channels group (which manages communication with all IOT devices), to ensure this device is part of that group.
+          const result = await pubnub.channelGroups.addChannels({
+            channels: [channelName],
+            channelGroup: channelGroupAllDevices
+          })
+        } catch (status) {
+          console.log('Failed to create channel groups: ' + status)
+        }
+        if (!iotDevices[deviceId]) {
+          iotDevices[deviceId] = {
+            online: 'unknown',
+            selected: false,
+            name: deviceName,
+            channelName: channelName,
+            lat: 0.0,
+            long: 0.0,
+            sensors: [
+              {
+                sensor_name: '',
+                sensor_type: '',
+                sensor_update_frequency: 0,
+                sensor_value: 0.0,
+                sensor_units: '',
+                sensor_lastupdate: ''
+              }
+            ],
+            firmware_version: 'Unknown',
+            eaAction: '',
+            eaActionTime: '',
+            mapMarker: null
+          }
+          addRegisteredDevice(deviceId)
+        }
+        simulatorTask.postMessage({
+          action: 'finalizeProvisioning',
+          params: { sub: subscribe_key, pub: publish_key, route: args.route }
+        })
+      } else if (event.data.command === 'provisionComplete') {
+        var deviceId = event.data.values.deviceId
+        await updateDevicePresence(deviceId)
+
+        resolve(simulatorTask)
+      }
+    }
+    simulatorTask.postMessage({
+      action: 'init',
+      params: {
+        id: args.id,
+        name: args.name,
+        type: args.type,
+        route: args.route,
+        lat: args.lat,
+        long: args.long
+      }
+    })
+  })
+}
+
+async function updateDevicePresence (deviceId) {
+  //  In the case of page refreshes, update the presence information manually for pre-created simulators
+  try {
+    const result = await pubnub.whereNow({
+      uuid: deviceId
+    })
+    if (result.channels.length > 0) {
+      //  This device is subscribed to at least one channel
+      if (iotDevices[deviceId]) {
+        iotDevices[deviceId].online = 'yes'
+        updateRegisteredDevice(deviceId)
+      }
+    }
+  } catch (status) {
+    console.log(status)
+  }
+}
