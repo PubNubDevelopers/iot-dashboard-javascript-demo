@@ -7,7 +7,7 @@ var http = require('http')
 var path = require('path')
 var reload = require('reload')
 var bodyParser = require('body-parser')
-var pubNubInteractiveDemo = require('pubnub-demo-integration')
+//var pubNubInteractiveDemo = require('pubnub-demo-integration')
 var fetch = require('node-fetch')
 
 const port = 8001
