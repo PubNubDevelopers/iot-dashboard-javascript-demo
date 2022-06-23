@@ -22,7 +22,7 @@ async function initializeSimulators () {
   var id = 'sim_2' + makeid(6);
   await createSimulator({
     id: id,
-    name: 'European Freezer Truck',
+    name: 'EU Freezer Truck',
     type: SensorType.FreezerTemperature,
     route: Routes.Eur2,
     lat: Routes.Eur2.startLat,
@@ -61,7 +61,7 @@ async function initializeSimulators () {
   var id = 'sim_5' + makeid(6);
   await createSimulator({
     id: id,
-    name: 'Californian Chilled Truck',
+    name: 'USA Chilled Truck',
     type: SensorType.RefrigeratorTemperature,
     route: Routes.I5NS,
     lat: Routes.I5NS.startLat,
