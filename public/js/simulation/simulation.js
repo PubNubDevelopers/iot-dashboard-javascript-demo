@@ -48,7 +48,7 @@ async function initializeSimulators () {
   var id = 'sim_4' + makeid(6);
   await createSimulator({
     id: id,
-    name: 'Australian Air Quality Monitor',
+    name: 'Australian Air Quality',
     type: SensorType.Air_Pollution,
     route: Routes.Aus,
     lat: Routes.Aus.startLat,

@@ -36,15 +36,15 @@ function registeredDeviceRow (deviceId) {
   var html = ''
   var mobile = ''
   if (iotDevices[deviceId].mobile === true) {
-    mobile = "<span class='badge rounded-pill bg-light text-dark'>Moving</span>"
+    mobile = "<span class='badge rounded-pill custom-bubble'>Moving</span>"
   }
   var presence = ''
   if (iotDevices[deviceId].online === 'yes') {
     presence +=
-      "<span style='color:green;float:right;margin-right:5px' data-bs-toggle='tooltip' data-bs-placement='right' title='Device is Online'>" + mobile + "<i class='fa-solid fa-circle'></i>&nbsp;&nbsp;" + editIcon + "</span>"
+      "<span style='color:green;float:right;margin-right:5px' data-bs-toggle='tooltip' data-bs-placement='right' title='Device is Online'>" + mobile + " <i class='fa-solid fa-circle'></i>&nbsp;&nbsp;" + editIcon + "</span>"
   } else {
     presence +=
-      "<span style='color:gray;float:right;margin-right:5px' data-bs-toggle='tooltip' data-bs-placement='right' title='Device is Offline'>" + mobile + "<i class='fa-regular fa-circle'></i>&nbsp;&nbsp;" + editIcon + "</span>"
+      "<span style='color:gray;float:right;margin-right:5px' data-bs-toggle='tooltip' data-bs-placement='right' title='Device is Offline'>" + mobile + " <i class='fa-regular fa-circle'></i>&nbsp;&nbsp;" + editIcon + "</span>"
   }
   html += iotDevices[deviceId].name + ' '
   //html += editIcon + ''
