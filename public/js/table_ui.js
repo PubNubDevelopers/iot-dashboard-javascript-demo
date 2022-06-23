@@ -81,7 +81,7 @@ function populateSelectedDeviceTable (deviceId, manuallyInvoked) {
       })
     if (
       deviceId != null &&
-      iotDevices[deviceId].name == 'European Freezer Truck'
+      iotDevices[deviceId].name == 'EU Freezer Truck'
     )
       actionCompleted({
         action: 'Find the European freezer truck',
