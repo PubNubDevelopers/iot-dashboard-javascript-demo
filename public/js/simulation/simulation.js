@@ -6,7 +6,7 @@ var client = null
 
 async function initializeSimulators () {
   //  Note: Specify null route for a stationary object
-  var id = 'sim_1'
+  var id = 'sim_1' + makeid(3);
   await createSimulator({
     id: id,
     name: 'Californian Chilled Truck',
@@ -19,7 +19,7 @@ async function initializeSimulators () {
   })
   iotDevices[id].worker.postMessage({ action: 'start' })
 
-  var id = 'sim_2'
+  var id = 'sim_2' + makeid(3);
   await createSimulator({
     id: id,
     name: 'European Freezer Truck',
@@ -32,7 +32,7 @@ async function initializeSimulators () {
   })
   iotDevices[id].worker.postMessage({ action: 'start' })
 
-  var id = 'sim_3'
+  var id = 'sim_3' + makeid(3);
   await createSimulator({
     id: id,
     name: 'Radiation Monitor at HMNB Clyde',
@@ -45,7 +45,7 @@ async function initializeSimulators () {
   })
   iotDevices[id].worker.postMessage({ action: 'start' })
 
-  var id = 'sim_4'
+  var id = 'sim_4' + makeid(3);
   await createSimulator({
     id: id,
     name: 'Australian mobile Air Quality Monitor',
@@ -58,7 +58,7 @@ async function initializeSimulators () {
   })
   iotDevices[id].worker.postMessage({ action: 'start' })
 
-  var id = 'sim_5'
+  var id = 'sim_5' + makeid(3);
   await createSimulator({
     id: id,
     name: 'Victoria Falls Wind Speed',
@@ -71,7 +71,7 @@ async function initializeSimulators () {
   })
   iotDevices[id].worker.postMessage({ action: 'start' })
 
-  var id = 'sim_6'
+  var id = 'sim_6' + makeid(3);
   await createSimulator({
     id: id,
     name: 'Transalpine mobile Air Quality Monitor',
@@ -132,7 +132,8 @@ async function createSimulator (args) {
             firmware_version: 'Unknown',
             eaAction: '',
             eaActionTime: '',
-            mapMarker: null
+            mapMarker: null,
+            mobile: (args.route === null) ? false : true
           }
           addRegisteredDevice(deviceId)
         }

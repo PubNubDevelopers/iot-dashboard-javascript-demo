@@ -1,3 +1,5 @@
+# WORK IN PROGRESS
+
 # IoT Dashboard Demo written in JavaScript
 > Application to show how PubNub can be used for IoT use cases, displaying and controlling worldwide IoT assets in real time
 
@@ -116,22 +118,22 @@ The steps to do this are as follows:
 
 **A Note about Signals**
 
-PubNub offers the `signal()` method as an alternative to `publish()` for short lived, ephemeral data which goes out of date quickly.  The same delivery guarantees do not exist for signals but signal pricing can be lower than publish.  The primary limitation of signals, besides not being able to be stored from history or trigger push messages, is that they are limited to **64bytes**.  This demo opts to use a more descriptive message payload and therefore uses `publish()` but if you want to limit your updates to 64bytes, e.g. just passing a lat/long, then you could potentially save costs on your overall solution by using `signal()`.
+PubNub offers the `signal()` method as an alternative to `publish()` for short lived, ephemeral data which goes out of date quickly.  The same delivery guarantees do not exist for signals but signal pricing can be lower than publish.  The primary limitation of signals, besides not being able to be stored in history or trigger push messages, is that they are limited to **64bytes**.  This demo opts to use a more descriptive message payload and therefore uses `publish()` but if you want to limit your updates to 64bytes, e.g. just passing a lat/long, then you could potentially save costs on your overall solution by using `signal()`.
 
 **Provisioning**
 
-This demo has been built to be expanded in the future to handle real IoT devices.  You may see strange workflows in the code, for example, assigning the simulator an ID and then asking that same simulator for the ID it was just assigned.  The intention is to show that these two pieces of information would usually come from a provisioning server, in production and hence the workflow is separated.
+This demo has been built to be expanded in the future to handle real IoT devices.  You may see strange workflows in the code, for example, assigning the simulator an ID and then asking that same simulator for the ID it was just assigned.  The intention is to show that these two pieces of information would usually come from a provisioning server in production and hence the workflow is separated.
 
 
 **Persistence:**
 
 - For ease of use, this demo lacks any kind of serverside persistence.  Most customers deploying an IoT solution with PubNub to production will choose to use **[PubNub Objects](https://www.pubnub.com/docs/sdks/javascript/api-reference/objects)** to store attributes of the device.  This is analogous to a 'device shadow' in AWS or 'twin device' in Azure.
 - Because objects are only stored locally, if you refresh the page you will lose any created simulators.  **This is a limitation of the demo, not a limitation of PubNub**.
-- You will also see this if you open multiple instances of this application in different browser tabs.  Any device (simulator) you create will only have its messages subscribed to by the tab in which you created the device.  Similarly, with the pre-defined simulators running in multiple tabs, because the device IDs for these pre-defined simulators are hard coded, their messages will be received by all open tabs - **for this reason, the the location of the simulator will appear to jitter if multiple tabs are open**.
+- You will also see this if you open multiple instances of this application in different browser tabs.  Any device (simulator) you create will only have its messages subscribed to by the tab in which you created the device.
 
 **MQTT:**
 
-- Most IOT solutions will use [MQTT](https://www.pubnub.com/learn/glossary/mqtt/) to exchange messages between devices and a server.  PubNub offer an [MQTT bridge](https://www.pubnub.com/docs/sdks/mqtt-pubnub-bridge) to integrate devices that communicate via MQTT and many of our IoT customers choose to take advantage of this.  The simulated devices spawned by this application only support the [PubNub JavaScript SDK](https://www.pubnub.com/docs/sdks/javascript) - though I had originally intended to also support MQTT in these simulators it turns out this is [non-trivial](https://stackoverflow.com/questions/16047344/can-a-web-browser-use-mqtt); to keep things simple, MQTT integration is left for a future exercise.
+- Most IoT solutions will use [MQTT](https://www.pubnub.com/learn/glossary/mqtt/) to exchange messages between devices and a server.  PubNub offer an [MQTT bridge](https://www.pubnub.com/docs/sdks/mqtt-pubnub-bridge) to integrate devices that communicate via MQTT and many of our IoT customers choose to take advantage of this.  The simulated devices spawned by this application only support the [PubNub JavaScript SDK](https://www.pubnub.com/docs/sdks/javascript) - **This is a limitation of the demo, not a limitation of PubNub**.  MQTT integration is best done using real devices.
 - **Real Devices:** Although this dashboard has been designed to integrate with real devices, the step-by-step tutorial to do this is left for a future exercise.
 
 **Events and Actions**

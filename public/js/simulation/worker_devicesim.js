@@ -149,12 +149,12 @@ if ('function' === typeof importScripts) {
           }
         }
       } else if (this.sensorType == SensorType.RadiationMonitor) {
-        this.interval = 10000
-        //  0.01 with a 5% chance of going to 1
+        //  Average around 0.04.  Vary by 0.03Sv
+        //  0.5% chance of going to 1
         this.model = function (x) {
-          var test = Math.floor(Math.random() * 20 + 1)
+          var test = Math.floor(Math.random() * 200 + 1)
           if (test === 1) return 1
-          else return 0.01
+          else return 0.03 * Math.sin(x) + 0.04;
         }
         this.sensorName = SensorType['RadiationMonitor']
         this.sensorType = 'Radiation'
@@ -168,7 +168,6 @@ if ('function' === typeof importScripts) {
           }
         }
       } else if (this.sensorType == SensorType.Anemometer) {
-        this.interval = 10000
         //  Average around a value of 4.  Vary by 5 (mph)
         //  y = 5sin(x) + 4
         this.model = function (x) {

@@ -10,6 +10,7 @@ var initialize = function () {
   var myLatlng = new google.maps.LatLng(37.7749, 0.0)
   map = new google.maps.Map(document.getElementById('map-canvas'), {
     zoom: 2,
+    minZoom: 2,
     center: myLatlng,
     streetViewControl: false
   })
@@ -62,7 +63,7 @@ function moveMapMarker (deviceId, populateSelectedDeviceTable) {
       populateSelectedDeviceTable(deviceId, true)
 
       //  DEMO: used by the interactive demo
-      actionCompleted({ action: 'Click on a map marker', debug: true })
+      actionCompleted({ action: 'Click on a map marker', debug: false })
       //  END DEMO: used by the interactive demo
     })
   } else {

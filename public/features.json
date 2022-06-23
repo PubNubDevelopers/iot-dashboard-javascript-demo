@@ -1,0 +1,14 @@
+{
+    "features": [
+      "View the Victoria falls windspeed",
+      "Find the European freezer truck",
+      "Create a freezer temperature sensor in Warsaw",
+      "Create an air pollution sensor in Dallas",
+      "Delete a device",
+      "Click on a map marker",
+      "Modify any sensor reporting interval to 60 seconds",
+      "Reboot any device (it will go offline briefly)",
+      "Update any device firmware",
+      "Change the name of any device to 'Fred'"
+    ]
+}

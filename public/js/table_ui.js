@@ -33,19 +33,21 @@ function registeredDeviceRow (deviceId) {
     "<span style='float:right'><H5><a href='javascript:editDevice(" +
     deviceId +
     ")' style='color:black'><i class='fa-regular fa-pen-to-square'></i></H5></span>"
-  //var rubbishBin = "<span style='float:right'><H5><a href='javascript:deleteDevice(" + deviceId + ")' style='color:red'><i class='fa-solid fa-trash-can'></i></H5></span>";
   var html = ''
+  var mobile = ''
+  if (iotDevices[deviceId].mobile === true) {
+    mobile = "<span class='badge rounded-pill bg-light text-dark'>Moving</span>"
+  }
   var presence = ''
   if (iotDevices[deviceId].online === 'yes') {
     presence +=
-      "<span style='color:green;float:right;margin-right:5px' data-bs-toggle='tooltip' data-bs-placement='right' title='Device is Online'><i class='fa-solid fa-circle'></i></span>"
+      "<span style='color:green;float:right;margin-right:5px' data-bs-toggle='tooltip' data-bs-placement='right' title='Device is Online'>" + mobile + "<i class='fa-solid fa-circle'></i></span>"
   } else {
     presence +=
-      "<span style='color:gray;float:right;margin-right:5px' data-bs-toggle='tooltip' data-bs-placement='right' title='Device is Offline'><i class='fa-regular fa-circle'></i></span>"
+      "<span style='color:gray;float:right;margin-right:5px' data-bs-toggle='tooltip' data-bs-placement='right' title='Device is Offline'>" + mobile + "<i class='fa-regular fa-circle'></i></span>"
   }
   html += iotDevices[deviceId].name + ' '
   html += editIcon + ''
-  //html += rubbishBin + '';
   html += presence + ''
   return html
 }
