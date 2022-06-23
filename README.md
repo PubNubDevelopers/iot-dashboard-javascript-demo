@@ -5,7 +5,7 @@
 
 PubNub can help you manage your distributed portfolio of IoT devices, either built into an existing product you produce or by integrating with 3rd party sensors.  Using PubNub you can communicate bidirectionally with global assets in real time with minimum latency.
 
-This IoT dashboard shows how an IoT solution managed by PubNub might look - remote devices will report their status and sensor readings periodically and you can view them as well as their location and online / offline state.
+This IoT dashboard shows how an IoT solution managed by PubNub might look - remote devices will periodically report their status and sensor readings.  You can view device location as well as their online / offline state.
 
 > This application is designed to show how an IoT solution with PubNub might look and is deliberately a **canned demo**.  For information on how to take this concept to production, please see the next steps section at the end of this ReadMe.  
 

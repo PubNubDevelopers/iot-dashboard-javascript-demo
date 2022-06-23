@@ -29,7 +29,12 @@ app.get('/', (req, res) => {
   return res.redirect('index.html')
 })
 
-//  Entry point for when the apps wants to send a message to the interactive demo.  This somewhat convoluted logic is so this app can use the same pubnub-demo-integration module as used by other demos.
+/**
+ * Entry point for when the apps wants to send a message to the interactive demo. 
+ * I originally wanted to use the pubnub-demo-integration module for consistency with other demos.
+ * Unfortunately, Netlify would require some additional logic for me to expose this so I just implemented the interactive demo logic entirely in JavaScript (demo_interface.js)
+ */
+/*
 app.get('/interactivedemo/*', (req, res) => {
   //  Sending a message to the interactive demo
   try {
@@ -59,6 +64,7 @@ app.get('/interactivedemo/*', (req, res) => {
     res.sendStatus(500)
   }
 })
+*/
 
 var server = http.createServer(app)
 

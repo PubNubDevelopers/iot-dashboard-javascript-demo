@@ -121,6 +121,7 @@ async function createModalCreateDevice () {
   })
   iotDevices[deviceId].worker.postMessage({ action: 'start' })
   focusOnLatLong(inDeviceLat, inDeviceLong)
+  populateSelectedDeviceTable(deviceId, true)
 
   //  DEMO: used by the interactive demo
   if (

@@ -33,11 +33,14 @@
     <script src="./js/demo/demo_interface.js"></script>
 </head>
 
+<!-- Interactive demo hosts this content in a window 824 pixels wide -->
+
 <body id="body" onload="onload();">
     <script src="/reload/reload.js"></script>
     <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
 
         <!-- Nav Bar (simulated) -->
+        <div style="display:none">
         <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur"
             navbar-scroll="true">
             <div class="container-fluid py-1 px-3">
@@ -60,12 +63,13 @@
                 </div>
             </div>
         </nav>
+        </div>
 
         <!-- 'Header' -->
         <div class="container">
             <div class="text-center">
-                <H1>PubNub IoT Demo</H1>
-                <div class="alert alert-primary align-items-center" id="loadWarning" role="alert">
+                <!-- <H1>PubNub IoT Demo</H1> -->
+                <div class="alert alert-primary align-items-center mt-3" id="loadWarning" role="alert">
                     <div class="text-center fs-4">
                         Clearing previous devices. Creating simulated Devcies
                         <div class="spinner-border float-end" role="status">
@@ -87,15 +91,15 @@
         <!--  Main app body -->
         <div class="container-fluid px-2">
             <div class="row gy-2 px-2">
-                <div class="col-lg-8 col-md-8 px-2">
-                    <div style="height:100%;height: 800px;" id="map-canvas">.</div>
+                <div class="col-lg-8 col-md-7 px-2">
+                    <div style="height:100%;height: 700px;" id="map-canvas">.</div>
                 </div>
                 <div class="col">
                     <div class="row gy-2 px-2">
                         <div style="" id="" class="px-0">
-                            <div class="card text-dark mb-3" style="width:100%;">
-                                <div class="card-body bg-light">
-                                    <h5 class="card-title text-center" id="selected-name">Please Select a Device</h5>
+                            <div class="card text-dark mb-1" style="width:100%;">
+                                <div class="card-header text-center" id="selected-name">Please Select a Device</div>
+                                <div class="card-body bg-light" style="display:none">
                                     <span class="card-text small fw-bold">ID:</span>
                                     <span class="card-text small" id="selected-id"></span>
                                     <span class="float-end">
@@ -104,13 +108,13 @@
                                     </span>
                                 </div>
                                 <ul class="list-group list-group-flush">
-                                    <li class="list-group-item" id="selected-location">Location: </li>
-                                    <li class="list-group-item" id="selected-sensor-name">Sensor: </li>
-                                    <li class="list-group-item" id="selected-sensor-value">Reading</li>
-                                    <li class="list-group-item" id="selected-sensor-update-frequency">Update Frequency:
+                                    <li class="list-group-item small" id="selected-location">Location: </li>
+                                    <li class="list-group-item small" id="selected-sensor-name">Sensor: </li>
+                                    <li class="list-group-item small" id="selected-sensor-value">Reading</li>
+                                    <li class="list-group-item small" id="selected-sensor-update-frequency">Update Frequency:
                                     </li>
-                                    <li class="list-group-item" id="selected-last-seen">Last Seen: </li>
-                                    <li class="list-group-item" id="selected-firmware">Firmware</li>
+                                    <li class="list-group-item small" id="selected-last-seen">Last Seen: </li>
+                                    <li class="list-group-item small" id="selected-firmware">Firmware</li>
                                 </ul>
                                 <a href="javascript:deleteDevice(selectedId);" class="btn btn-danger"
                                     id="selected-delete-device" style="display:none">Delete Device</a>
@@ -121,9 +125,7 @@
                         <div style="" id="" class="px-0">
                             <div style="" id="" class="px-0">
                                 <div class="card text-dark bg-light mb-3" style="width:100%;">
-                                    <div class="card-body">
-                                        <h5 class="card-title text-center">Registered Devices</h5>
-                                    </div>
+                                    <div class="card-header text-center">Registered Devices</div>
                                     <a href="javascript:createNewDevice();" class="btn btn-info">Create New Device</a>
                                     <ul class="list-group list-group-flush" id="registeredDevicesList">
                                     </ul>
@@ -136,7 +138,7 @@
         </div>
 
         <!-- Footer -->
-        <footer class="footer pt-3  ">
+        <footer class="footer pt-3" style="display:none">
             <div class="container-fluid">
                 <div class="row align-items-center justify-content-lg-between">
                     <div class="col-lg-3 mb-lg-0 mb-4">

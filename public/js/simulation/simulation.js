@@ -6,59 +6,7 @@ var client = null
 
 async function initializeSimulators () {
   //  Note: Specify null route for a stationary object
-  var id = 'sim_1' + makeid(3);
-  await createSimulator({
-    id: id,
-    name: 'Californian Chilled Truck',
-    type: SensorType.RefrigeratorTemperature,
-    route: Routes.I5NS,
-    lat: Routes.I5NS.startLat,
-    long: Routes.I5NS.startLong
-  }).then(webWorker => {
-    iotDevices[id].worker = webWorker
-  })
-  iotDevices[id].worker.postMessage({ action: 'start' })
-
-  var id = 'sim_2' + makeid(3);
-  await createSimulator({
-    id: id,
-    name: 'European Freezer Truck',
-    type: SensorType.FreezerTemperature,
-    route: Routes.Eur2,
-    lat: Routes.Eur2.startLat,
-    long: Routes.Eur2.startLong
-  }).then(webWorker => {
-    iotDevices[id].worker = webWorker
-  })
-  iotDevices[id].worker.postMessage({ action: 'start' })
-
-  var id = 'sim_3' + makeid(3);
-  await createSimulator({
-    id: id,
-    name: 'Radiation Monitor at HMNB Clyde',
-    type: SensorType.RadiationMonitor,
-    route: null,
-    lat: 56.0674,
-    long: -4.8146
-  }).then(webWorker => {
-    iotDevices[id].worker = webWorker
-  })
-  iotDevices[id].worker.postMessage({ action: 'start' })
-
-  var id = 'sim_4' + makeid(3);
-  await createSimulator({
-    id: id,
-    name: 'Australian mobile Air Quality Monitor',
-    type: SensorType.Air_Pollution,
-    route: Routes.Aus,
-    lat: Routes.Aus.startLat,
-    long: Routes.Aus.startLong
-  }).then(webWorker => {
-    iotDevices[id].worker = webWorker
-  })
-  iotDevices[id].worker.postMessage({ action: 'start' })
-
-  var id = 'sim_5' + makeid(3);
+  var id = 'sim_1' + makeid(6);
   await createSimulator({
     id: id,
     name: 'Victoria Falls Wind Speed',
@@ -71,10 +19,62 @@ async function initializeSimulators () {
   })
   iotDevices[id].worker.postMessage({ action: 'start' })
 
-  var id = 'sim_6' + makeid(3);
+  var id = 'sim_2' + makeid(6);
   await createSimulator({
     id: id,
-    name: 'Transalpine mobile Air Quality Monitor',
+    name: 'European Freezer Truck',
+    type: SensorType.FreezerTemperature,
+    route: Routes.Eur2,
+    lat: Routes.Eur2.startLat,
+    long: Routes.Eur2.startLong
+  }).then(webWorker => {
+    iotDevices[id].worker = webWorker
+  })
+  iotDevices[id].worker.postMessage({ action: 'start' })
+
+  var id = 'sim_3' + makeid(6);
+  await createSimulator({
+    id: id,
+    name: 'Radiation Monitor',
+    type: SensorType.RadiationMonitor,
+    route: null,
+    lat: 56.0674,
+    long: -4.8146
+  }).then(webWorker => {
+    iotDevices[id].worker = webWorker
+  })
+  iotDevices[id].worker.postMessage({ action: 'start' })
+
+  var id = 'sim_4' + makeid(6);
+  await createSimulator({
+    id: id,
+    name: 'Australian Air Quality Monitor',
+    type: SensorType.Air_Pollution,
+    route: Routes.Aus,
+    lat: Routes.Aus.startLat,
+    long: Routes.Aus.startLong
+  }).then(webWorker => {
+    iotDevices[id].worker = webWorker
+  })
+  iotDevices[id].worker.postMessage({ action: 'start' })
+
+  var id = 'sim_5' + makeid(6);
+  await createSimulator({
+    id: id,
+    name: 'Californian Chilled Truck',
+    type: SensorType.RefrigeratorTemperature,
+    route: Routes.I5NS,
+    lat: Routes.I5NS.startLat,
+    long: Routes.I5NS.startLong
+  }).then(webWorker => {
+    iotDevices[id].worker = webWorker
+  })
+  iotDevices[id].worker.postMessage({ action: 'start' })
+
+  var id = 'sim_6' + makeid(6);
+  await createSimulator({
+    id: id,
+    name: 'Transalpine Air Quality',
     type: SensorType.Air_Pollution,
     route: Routes.Eur1,
     lat: Routes.Eur1.startLat,
@@ -98,7 +98,7 @@ async function createSimulator (args) {
         var deviceName = event.data.values.deviceName
         if (!iotDevices[deviceId]) {
           iotDevices[deviceId] = {
-            online: 'unknown',
+            online: 'yes',
             selected: false,
             name: deviceName,
             channelName: channelName,
@@ -128,6 +128,7 @@ async function createSimulator (args) {
         })
       } else if (event.data.command === 'provisionComplete') {
         var deviceId = event.data.values.deviceId
+
         resolve(simulatorTask)
       }
     }

@@ -41,13 +41,13 @@ function registeredDeviceRow (deviceId) {
   var presence = ''
   if (iotDevices[deviceId].online === 'yes') {
     presence +=
-      "<span style='color:green;float:right;margin-right:5px' data-bs-toggle='tooltip' data-bs-placement='right' title='Device is Online'>" + mobile + "<i class='fa-solid fa-circle'></i></span>"
+      "<span style='color:green;float:right;margin-right:5px' data-bs-toggle='tooltip' data-bs-placement='right' title='Device is Online'>" + mobile + "<i class='fa-solid fa-circle'></i>&nbsp;&nbsp;" + editIcon + "</span>"
   } else {
     presence +=
-      "<span style='color:gray;float:right;margin-right:5px' data-bs-toggle='tooltip' data-bs-placement='right' title='Device is Offline'>" + mobile + "<i class='fa-regular fa-circle'></i></span>"
+      "<span style='color:gray;float:right;margin-right:5px' data-bs-toggle='tooltip' data-bs-placement='right' title='Device is Offline'>" + mobile + "<i class='fa-regular fa-circle'></i>&nbsp;&nbsp;" + editIcon + "</span>"
   }
   html += iotDevices[deviceId].name + ' '
-  html += editIcon + ''
+  //html += editIcon + ''
   html += presence + ''
   return html
 }
@@ -91,7 +91,7 @@ function populateSelectedDeviceTable (deviceId, manuallyInvoked) {
   }
 
   document.getElementById('selected-name').innerHTML =
-    deviceId != null ? 'Selected: ' + iotDevices[deviceId].name : 'Selected: '
+    deviceId != null ? '' + iotDevices[deviceId].name : 'Selected: '
   document.getElementById('selected-id').innerHTML =
     deviceId != null ? '' + deviceId : ''
   document.getElementById('selected-channel-name').innerHTML =
@@ -132,7 +132,7 @@ function populateSelectedDeviceTable (deviceId, manuallyInvoked) {
   }
   document.getElementById('selected-last-seen').innerHTML =
     deviceId != null
-      ? 'Last Seen: ' + iotDevices[deviceId].sensors[0].sensor_lastupdate
+      ? 'Last Seen: ' + formatDate(iotDevices[deviceId].sensors[0].sensor_lastupdate)
       : 'Last Seen:'
   document.getElementById('selected-firmware').innerHTML =
     deviceId != null
@@ -140,6 +140,14 @@ function populateSelectedDeviceTable (deviceId, manuallyInvoked) {
       : 'Firmware:'
   document.getElementById('selected-delete-device').style.display =
     deviceId != null ? 'block' : 'none'
+}
+
+function formatDate(dateString)
+{
+  let formattedDate = new Date(dateString)
+  const options = { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
+
+  return formattedDate.toLocaleDateString('en-US', options);
 }
 
 var ul = document.getElementById('registeredDevicesList');
