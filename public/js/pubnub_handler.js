@@ -6,7 +6,6 @@
  */
 
 var pubnub = null
-const channelGroupAllDevices = 'cg_iot_all'
 var iotDevices = null
 var selectedId = null
 
@@ -19,8 +18,8 @@ async function onload () {
     await pubnub.addListener({
       //  Status events
       status: async statusEvent => {
-        //  Channel group subscription is now complete, pre-populate with simulators.
-        if (statusEvent.affectedChannelGroups[0] === channelGroupAllDevices) {
+        //  Channel subscription is now complete, pre-populate with simulators.
+        if (statusEvent.affectedChannels[0] === 'device.*') {
           initializeSimulators()
         }
       },
@@ -69,10 +68,10 @@ async function onload () {
       }
     })
 
-    //  Subscribe to the single channel group which manages all IoT device communication.
-    //  Devices are added to this group after they are created.
-    const cgSubscibeResult = await pubnub.subscribe({
-      channelGroups: [channelGroupAllDevices]
+    //  Wildcard subscribe, to listen for all devices in a scalable manner
+    pubnub.subscribe({
+      channels: ["device.*"],
+      withPresence: true
     })
   }
 }

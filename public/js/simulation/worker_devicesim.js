@@ -23,7 +23,7 @@ if ('function' === typeof importScripts) {
     //  Initialization / provisioning has been implemented this way to more closely resemble how provisioning will work in production - see ReadMe for more details.
     if (args.data.action === 'init') {
       id = args.data.params.id
-      deviceChannelName = 'device_' + id
+      deviceChannelName = 'device.' + id
       defaultDeviceName = args.data.params.name
       lat = args.data.params.lat
       long = args.data.params.long
@@ -59,7 +59,6 @@ if ('function' === typeof importScripts) {
         },
         message: async payload => {
           if (payload.publisher !== id) {
-            console.log(payload)
             if (payload.message.action === 'reboot') {
               deviceSimulator.reboot()
             } else if (payload.message.action === 'stop') {

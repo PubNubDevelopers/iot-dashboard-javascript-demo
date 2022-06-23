@@ -96,21 +96,6 @@ async function createSimulator (args) {
         var channelName = event.data.values.channelName
         var deviceId = event.data.values.deviceId
         var deviceName = event.data.values.deviceName
-        //  Add simulator to channel group
-        try {
-          //  Subscribe to presence information for the device, so we will receive presence events
-          const controlSubscirbeRsesult = await pubnub.subscribe({
-            channels: [channelName + '-pnpres']
-          })
-
-          //  Update the channels group (which manages communication with all IOT devices), to ensure this device is part of that group.
-          const result = await pubnub.channelGroups.addChannels({
-            channels: [channelName],
-            channelGroup: channelGroupAllDevices
-          })
-        } catch (status) {
-          console.log('Failed to create channel groups: ' + status)
-        }
         if (!iotDevices[deviceId]) {
           iotDevices[deviceId] = {
             online: 'unknown',
@@ -143,8 +128,6 @@ async function createSimulator (args) {
         })
       } else if (event.data.command === 'provisionComplete') {
         var deviceId = event.data.values.deviceId
-        await updateDevicePresence(deviceId)
-
         resolve(simulatorTask)
       }
     }
@@ -160,22 +143,4 @@ async function createSimulator (args) {
       }
     })
   })
-}
-
-async function updateDevicePresence (deviceId) {
-  //  In the case of page refreshes, update the presence information manually for pre-created simulators
-  try {
-    const result = await pubnub.whereNow({
-      uuid: deviceId
-    })
-    if (result.channels.length > 0) {
-      //  This device is subscribed to at least one channel
-      if (iotDevices[deviceId]) {
-        iotDevices[deviceId].online = 'yes'
-        updateRegisteredDevice(deviceId)
-      }
-    }
-  } catch (status) {
-    console.log(status)
-  }
 }

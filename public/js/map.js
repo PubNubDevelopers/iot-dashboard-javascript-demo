@@ -19,7 +19,6 @@ var initialize = function () {
   function toggleBounce (marker) {
     if (marker.getAnimation() !== null) {
       marker.setAnimation(null)
-      console.log(marker.custom_id)
     } else {
       marker.setAnimation(google.maps.Animation.BOUNCE)
     }
