@@ -143,7 +143,8 @@ async function deleteDevice (target) {
       }
     })
 
-    iotDevices[deviceId].worker.terminate() //  Should really wait until we get the status message to say the client is disconnected but this is only for the simulator.
+    if (iotDevices[deviceId].worker != null)
+      iotDevices[deviceId].worker.terminate() //  Should really wait until we get the status message to say the client is disconnected but this is only for the simulator.
     removeRegisteredDevice(deviceId)
     iotDevices[deviceId].marker.setMap(null)
     populateSelectedDeviceTable(null, false)

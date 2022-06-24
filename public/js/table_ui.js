@@ -30,9 +30,9 @@ function removeRegisteredDevice (deviceId) {
 
 function registeredDeviceRow (deviceId) {
   var editIcon =
-    "<span style='float:right'><H5><a href='javascript:editDevice(" +
+    "<span style='float:right'><H5><a href='javascript:editDevice(\"" +
     deviceId +
-    ")' style='color:black'><i class='fa-regular fa-pen-to-square'></i></H5></span>"
+    "\")' style='color:black'><i class='fa-regular fa-pen-to-square'></i></H5></span>"
   var html = ''
   var mobile = ''
   if (iotDevices[deviceId].mobile === true) {
