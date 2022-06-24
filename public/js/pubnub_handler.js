@@ -19,32 +19,54 @@ async function onload () {
       //  Status events
       status: async statusEvent => {
         //  Channel subscription is now complete, pre-populate with simulators.
-        if (statusEvent.affectedChannels[0] === 'device.*') {
+        if (statusEvent.affectedChannels != null && statusEvent.affectedChannels[0] === 'device.*') {
           initializeSimulators()
         }
       },
       //  Messages from remote IOT devices.  Update the internal object that stores information about all these devices
       message: async payload => {
+        
+        //  Tutorial for adding an MQTT device
+        console.log(payload)
+        if (typeof payload.message.provision_device != "undefined")
+        {
+          //  The device is requesting to be provisioned, make an entry for it in the 
+          //  local devices array
+          provisionDevice(payload)
+          return
+        }
+
+        //  MQTT publisher is allocated by the broker, so switch to using the device ID we assigned.
+        if (typeof payload.message.mqtt_device_id != "undefined")
+        {
+          payload.publisher = payload.message.mqtt_device_id;
+        }
+        //  End Tutorial for adding an MQTT device
+
+
+        //  Unrecognised device
         if (
           iotDevices[payload.publisher] == null ||
           payload.publisher === pubnub.uuid
         )
+        {
           return
-
+        }
+        
         //console.log(payload)
         var nameChanged =
           iotDevices[payload.publisher].name != payload.message.friendly_name
         iotDevices[payload.publisher].name = payload.message.friendly_name
-        iotDevices[payload.publisher].lat = payload.message.lat
-        iotDevices[payload.publisher].long = payload.message.long
+        iotDevices[payload.publisher].lat = Number(payload.message.lat)
+        iotDevices[payload.publisher].long = Number(payload.message.long)
         iotDevices[payload.publisher].sensors[0].sensor_name =
           payload.message.sensors[0].sensor_name
         iotDevices[payload.publisher].sensors[0].sensor_value =
           Math.round(
-            (payload.message.sensors[0].sensor_value + Number.EPSILON) * 100
+            (Number(payload.message.sensors[0].sensor_value) + Number.EPSILON) * 100
           ) / 100
         iotDevices[payload.publisher].sensors[0].sensor_update_frequency =
-          payload.message.sensors[0].sensor_update_frequency
+          Number(payload.message.sensors[0].sensor_update_frequency)
         iotDevices[payload.publisher].sensors[0].sensor_units =
           payload.message.sensors[0].sensor_units
         iotDevices[payload.publisher].sensors[0].sensor_lastupdate = new Date(
@@ -59,18 +81,34 @@ async function onload () {
       },
       presence: presenceEvent => {
         //  Will be invoked regardless of the 'Announce Max' setting on the key
-        if (iotDevices[presenceEvent.uuid]) {
+        if (typeof iotDevices[presenceEvent.uuid] != "undefined") {
           if (presenceEvent.action === 'join')
             iotDevices[presenceEvent.uuid].online = 'yes'
           else iotDevices[presenceEvent.uuid].online = 'no'
           updateRegisteredDevice(presenceEvent.uuid)
+        }
+        else{
+          //  MQTT only - Need to look up the device ID from the (broker) uuid returned in the presence event
+          for (device in iotDevices)
+          {
+            if (iotDevices[device].mqttBrokerAssignedId != null &&
+              iotDevices[device].mqttBrokerAssignedId == presenceEvent.uuid)
+            {
+              console.log('mqtt ' + presenceEvent.action);
+              if (presenceEvent.action === 'join')
+                iotDevices[device].online = 'yes'
+              else 
+                iotDevices[device].online = 'no'
+              updateRegisteredDevice(device)            
+            }
+          }
         }
       }
     })
 
     //  Wildcard subscribe, to listen for all devices in a scalable manner
     pubnub.subscribe({
-      channels: ["device.*"],
+      channels: ["device.*", "mqtt_data_channel"],
       withPresence: true
     })
   }
