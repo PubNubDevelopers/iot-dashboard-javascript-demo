@@ -9,16 +9,23 @@
  
  function createPubNubObject (presetUUID) {
    var UUID = presetUUID // Allows you to force a uuid
+   let savedUUID = null
    if (!UUID) {
-     let savedUUID = sessionStorage.getItem('uuid')
+    try {
+      savedUUID = sessionStorage.getItem('uuid')
+    }
+    catch (err) {console.log("Session storage is unavailable");} //  Session storage not available
      if (!savedUUID) {
        UUID = makeid(20) // Make new UUID
      } else {
        UUID = savedUUID
      }
    }
-   sessionStorage.setItem('uuid', UUID)
- 
+   try {
+    sessionStorage.setItem('uuid', UUID)
+  }
+  catch (err) {}//  Session storage is not availalbe
+
    var pubnub = new PubNub({
      publishKey: publish_key,
      subscribeKey: subscribe_key,
