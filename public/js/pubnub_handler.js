@@ -27,7 +27,7 @@ async function onload () {
       message: async payload => {
         
         //  Tutorial for adding an MQTT device
-        console.log(payload)
+        //console.log(payload)
         if (typeof payload.message.provision_device != "undefined")
         {
           //  The device is requesting to be provisioned, make an entry for it in the 

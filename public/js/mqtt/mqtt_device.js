@@ -34,6 +34,8 @@ function provisionDevice(payload)
         addRegisteredDevice(deviceId)
     }
     else{
-        iotDevices[deviceId].mqttBrokerAssignedId = payload.publisher
+      iotDevices[deviceId].mqttBrokerAssignedId = payload.publisher
+      iotDevices[deviceId].online = 'yes'
+      updateRegisteredDevice(deviceId)
     }
 }
