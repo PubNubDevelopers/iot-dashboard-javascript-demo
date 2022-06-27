@@ -9,7 +9,7 @@ This IoT dashboard shows how an IoT solution managed by PubNub might look - remo
 
 > This application is designed to show how an IoT solution with PubNub might look and is deliberately a **canned demo**.  For information on how to take this concept to production, please see the next steps section at the end of this ReadMe.  
 
-![Screenshot](https://raw.githubusercontent.com/PubNubDevelopers/iot-dashboard-javascript-demo/main/media/screenshot.png)
+![Screenshot](https://raw.githubusercontent.com/PubNubDevelopers/iot-dashboard-javascript-demo/main/media/screenshot_square.png)
 
 ## Demo
 
