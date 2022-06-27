@@ -2,8 +2,8 @@ import paho.mqtt.client as mqtt
 from threading import Timer
 import json
 
-publish_key = "pub-c-76bc5dff-cd00-4c1a-9360-f750e213331b"
-subscribe_key = "sub-c-8f498a3e-8ef4-4373-913a-95aeb73fd21d"
+publish_key = ""    # YOUR PUBNUB PUBLISH KEY HERE
+subscribe_key = ""  # YOUR PUBNUB SUBSCRIBE KEY HERE
 client_id = "sim_py"
 channel_name = "device/" + client_id
 channel_name2 = "device." + client_id
