@@ -129,7 +129,7 @@ async function createModalCreateDevice () {
     selectSensorType.value == SensorType['FreezerTemperature']
   )
     actionCompleted({
-      action: 'Create a freezer temperature sensor in Warsaw',
+      action: 'Create a mobile freezer temperature sensor, starting in Warsaw',
       debug: false
     })
   if (
@@ -137,7 +137,7 @@ async function createModalCreateDevice () {
     selectSensorType.value == SensorType['Air_Pollution']
   )
     actionCompleted({
-      action: 'Create an air pollution sensor in Dallas',
+      action: 'Create a mobile air pollution sensor, starting in Dallas',
       debug: false
     })
   //  END DEMO: used by the interactive demo

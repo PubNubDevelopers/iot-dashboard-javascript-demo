@@ -2,8 +2,8 @@
     "features": [
       "View the Victoria falls windspeed",
       "Find the European freezer truck",
-      "Create a freezer temperature sensor in Warsaw",
-      "Create an air pollution sensor in Dallas",
+      "Create a mobile freezer temperature sensor, starting in Warsaw",
+      "Create a mobile air pollution sensor, starting in Dallas",
       "Delete a device",
       "Click on a map marker",
       "Modify any sensor reporting interval to 60 seconds",
