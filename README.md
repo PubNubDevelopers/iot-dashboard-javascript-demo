@@ -1,5 +1,3 @@
-# WORK IN PROGRESS
-
 # IoT Dashboard Demo written in JavaScript
 > Application to show how PubNub can be used for IoT use cases, displaying and controlling worldwide IoT assets in real time
 
@@ -13,7 +11,7 @@ This IoT dashboard shows how an IoT solution managed by PubNub might look - remo
 
 ## Demo
 
-
+A hosted version of this demo can be found at https://www.pubnub.com/demo/iot-dashboard/
 
 ## Features
 
@@ -50,8 +48,6 @@ To run this project yourself you will need a PubNub account and, optionally, a G
 1. Click your new app to open its settings, then click its keyset.
 
 1. Enable the Presence feature for your keyset.
-
-1. Enable the Message Persistence feature for your keyset.
 
 1. Enable the Stream Controller feature for your keyset.
 
