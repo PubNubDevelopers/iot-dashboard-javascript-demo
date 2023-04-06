@@ -1,7 +1,7 @@
 /**
  * Main entry point for communication coming from PubNub
  * The internal state of the application is managed by the 'iotDevices' object.
- * This is designed to show the principle of what IoT with PubNub would look like - obviously storing these objects as part of the client app state does not lend itself to multiple clients viewing the same simulated device(!).  PubNub Objects would be a good approach to managing your IoT devices on the server - see the ReadMe for more information.
+ * This is designed to show the principle of what IoT with PubNub would look like - obviously storing these entities as part of the client app state does not lend itself to multiple clients viewing the same simulated device(!).  PubNub App Context would be a good approach to managing your IoT devices on the server - see the ReadMe for more information.
  * Note: I used an auto-formatter on this code but I'm not sure I like how it turned out.
  */
 
