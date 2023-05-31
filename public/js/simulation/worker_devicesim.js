@@ -5,7 +5,7 @@
 
 if ('function' === typeof importScripts) {
   const window = null
-  importScripts('https://cdn.pubnub.com/sdk/javascript/pubnub.7.0.1.min.js')
+  importScripts('https://cdn.pubnub.com/sdk/javascript/pubnub.7.2.2.min.js')
   importScripts('./simulator_types.js')
 
   var deviceSimulator
@@ -49,9 +49,18 @@ if ('function' === typeof importScripts) {
         uuid: id,
         listenToBrowserNetworkEvents: false //  Allows us to call the PubNub SDK from a web worker
       })
+      var accessManagerToken = await requestAccessManagerToken(id)
+      if (accessManagerToken == null)
+      {
+        console.log('Error retrieving access manager token')
+      }
+      else{
+        localPubNub.setToken(accessManagerToken)
+      }
 
       await localPubNub.addListener({
         status: async statusEvent => {
+          //console.log(statusEvent)
           this.postMessage({
             command: 'provisionComplete',
             values: { deviceId: id }
@@ -323,6 +332,27 @@ if ('function' === typeof importScripts) {
       })
 
       tick++
+    }
+  }
+
+  async function requestAccessManagerToken (userId) {
+    try {
+      const TOKEN_SERVER = 'https://devrel-demos-access-manager.netlify.app/.netlify/functions/api/iotdemo'
+      const response = await fetch(`${TOKEN_SERVER}/grant`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ UUID: userId })
+      })
+  
+      const token = (await response.json()).body.token
+      //console.log('created token: ' + token)
+  
+      return token
+    } catch (e) {
+      console.log('failed to create token ' + e)
+      return null
     }
   }
 }

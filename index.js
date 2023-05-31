@@ -5,9 +5,8 @@
 var express = require('express')
 var http = require('http')
 var path = require('path')
-var reload = require('reload')
+//var reload = require('reload')
 var bodyParser = require('body-parser')
-//var pubNubInteractiveDemo = require('pubnub-demo-integration')
 var fetch = require('node-fetch')
 
 const port = 8001
@@ -31,7 +30,12 @@ app.get('/', (req, res) => {
 
 var server = http.createServer(app)
 
+server.listen(app.get('port'), function () {
+  console.log('Web server listening on port ' + app.get('port'))
+})
+
 // Reload code here
+/*
 reload(app)
   .then(function (reloadReturned) {
     server.listen(app.get('port'), function () {
@@ -44,3 +48,4 @@ reload(app)
       err
     )
   })
+  */
