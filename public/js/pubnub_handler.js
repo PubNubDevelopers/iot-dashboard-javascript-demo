@@ -14,11 +14,12 @@ async function onload () {
   if (!testPubNubKeys()) {
     document.getElementById('noKeysAlert').style.display = 'block'
   } else {
-    pubnub = createPubNubObject()
+    pubnub = await createPubNubObject()
     await pubnub.addListener({
       //  Status events
       status: async statusEvent => {
         //  Channel subscription is now complete, pre-populate with simulators.
+        //console.log(statusEvent)
         if (statusEvent.affectedChannels[0] === 'device.*') {
           initializeSimulators()
         }
