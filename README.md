@@ -70,9 +70,9 @@ To run this project yourself you will need a PubNub account and, optionally, a G
 	cd iot-dashboard-javascript-demo
 	```
 
-1. Add your pub/sub keys to `/public/js/pubnub_setup.js`
+1. Add your pub/sub keys to `/public/js/keys.js`
 
-1. (optional) Add your Google Maps API key which supports the JS Maps API to `public/js/map.js`.  See 'Using your own Google Maps API key', below.
+1. (optional) Add your Google Maps API key which supports the JS Maps API to `public/js/keys.js`.  See 'Using your own Google Maps API key', below.
 
 1. Install dependencies.
 
@@ -108,7 +108,7 @@ The steps to do this are as follows:
 
 1. Visit https://developers.google.com/maps/documentation/javascript/get-api-key and follow the instructions to create a project and API keys
 1. Make sure you have the following APIs enabled: 'Maps Embed API', 'Maps JavaScript API'.  Both of these are free.
-1. Add your Google Maps API key to `public/js/map.js`.
+1. Add your Google Maps API key to `public/js/keys.js`.
 
 ## Architectural Notes, Next Steps and Future Work
 

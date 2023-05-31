@@ -2,8 +2,6 @@
  * Logic to handle drawing the map and the markers.
  */
 
-//  Feel free to modify this to use your own key - see the ReadMe for more information
-const GOOGLE_MAP_KEY = 'AIzaSyBCgXgeJdrT-4A84hwbZJTtLQ0A1CiFcDw'
 var map = null
 
 var initialize = function () {

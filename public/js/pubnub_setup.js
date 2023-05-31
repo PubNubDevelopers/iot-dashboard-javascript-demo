@@ -4,10 +4,9 @@
  * See Readme for details of the required key configuration
  */
 
- const publish_key = '' //  ENTER YOUR PUBLISH KEY HERE
- const subscribe_key = '' //  ENTER YOUR SUBSCRIBE KEY HERE
- 
- function createPubNubObject (presetUUID) {
+  //  See Keys.js for the PubNub Publish and Subscribe keys
+
+  function createPubNubObject (presetUUID) {
    var UUID = presetUUID // Allows you to force a uuid
    let savedUUID = null
    if (!UUID) {
