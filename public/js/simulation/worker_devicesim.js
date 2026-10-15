@@ -48,7 +48,7 @@ if ('function' === typeof importScripts) {
         publishKey: pubKey,
         subscribeKey: subKey,
         userId: id, //  The device ID is the User ID, so presence events tell the dashboard which device joined or left.
-        listenToBrowserNetworkEvents: false //  Allows us to call the PubNub SDK from a web worker
+        listenToBrowserNetworkEvents: false //  A web worker has no window to watch for online/offline events.
       })
 
       localPubNub.addListener({
@@ -79,9 +79,9 @@ if ('function' === typeof importScripts) {
         }
       }
       subscription.onFile = payload => {
-        if (payload.publisher !== id) {
-          //  Only file we handle is firmware
-          deviceSimulator.updateFirmware(payload.file.name)
+        //  The only file a device handles is firmware: its name becomes the firmware version.
+        if (payload.publisher !== id && payload.file && typeof payload.file.name === 'string') {
+          deviceSimulator.updateFirmware(payload.file.name.substring(0, 60))
         }
       }
       subscription.subscribe()

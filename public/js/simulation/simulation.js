@@ -118,7 +118,7 @@ async function createSimulator (args) {
             eaAction: '',
             eaActionTime: '',
             mapMarker: null,
-            mobile: (args.route === null) ? false : true
+            mobile: !!(args.route && args.route.fileName) //  'None' is a route without a file: the device doesn't move.
           }
           addRegisteredDevice(deviceId)
         }

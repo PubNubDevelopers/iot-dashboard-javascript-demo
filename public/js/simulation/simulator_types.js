@@ -40,7 +40,7 @@ const Routes = {
     description: 'UK: London to Edinburgh',
     fileName: './routes/route_london_edinburgh.js',
     startLat: 51.50767,
-    startLong: -013102
+    startLong: -0.13102
   },
   Aus: {
     description: 'Australia: Melbourne to Adelaide',

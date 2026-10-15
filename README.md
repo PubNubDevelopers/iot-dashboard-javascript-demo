@@ -22,7 +22,7 @@ A hosted version of this demo can be found at https://www.pubnub.com/demos/iot-d
 
 ## Installing / Getting started
 
-This dashboard uses Node, npm and express to show how a PubNub IoT dashboard might look.  For ease of use, devices are simulated but please see [PubNub.com](http://www.pubnub.com) for previous blogs on integrating real IoT hardware such as Arduino and Raspberry Pi.
+This dashboard uses Node, npm and express to show how a PubNub IoT dashboard might look.  For ease of use, devices are simulated but please see [PubNub.com](https://www.pubnub.com/) for previous blogs on integrating real IoT hardware such as Arduino and Raspberry Pi.
 
 To run this project yourself you need a free PubNub account. The map uses [Leaflet](https://leafletjs.com/) with [OpenStreetMap](https://www.openstreetmap.org/) tiles, so it needs no API key.
 
@@ -32,7 +32,7 @@ Tested with the PubNub JavaScript SDK 13.1.2 and Node.js 22 (October 2026).
 - [Node.js](https://nodejs.org/en/)
 - [PubNub Account](#pubnub-account) (*Free*)
 
-<a href="https://dashboard.pubnub.com/signup">
+<a href="https://admin.pubnub.com/signup">
 	<img alt="PubNub Signup" src="https://i.imgur.com/og5DDjf.png" width=260 height=97/>
 </a>
 
@@ -77,9 +77,8 @@ Please fork the repository if you'd like to contribute. Pull requests are always
 
 Checkout the following lins for more information on developing IoT solutions with PubNub:
 
-- IoT use cases with PubNub: https://www.pubnub.com/use-case/iot-device-control/
-- IoT customers and case studies: https://www.pubnub.com/industry/iot-and-connected-devices/
-- IoT PubNub developer path: https://www.pubnub.com/developers/internet-of-things-developer-path/
+- IoT use cases with PubNub: https://www.pubnub.com/solutions/iot-device-control/
+- IoT customers and case studies: https://www.pubnub.com/solutions/iot-device-control/
 
 ## Architectural Notes, Next Steps and Future Work
 
@@ -104,10 +103,10 @@ This demo has been built to be expanded in the future to handle real IoT devices
 
 **MQTT:**
 
-- Most IoT solutions will use [MQTT](https://www.pubnub.com/learn/glossary/mqtt/) to exchange messages between devices and a server.  PubNub offer an [MQTT bridge](https://www.pubnub.com/docs/sdks/mqtt-pubnub-bridge) to integrate devices that communicate via MQTT and many of our IoT customers choose to take advantage of this.  The simulated devices spawned by this application only support the [PubNub JavaScript SDK](https://www.pubnub.com/docs/sdks/javascript) - **This is a limitation of the demo, not a limitation of PubNub**.  MQTT integration is best done using real devices.
+- Most IoT solutions will use [MQTT](https://www.pubnub.com/guides/mqtt/) to exchange messages between devices and a server.  The simulated devices spawned by this application only support the [PubNub JavaScript SDK](https://www.pubnub.com/docs/sdks/javascript) - **This is a limitation of the demo, not a limitation of PubNub**.  MQTT integration is best done using real devices.
 - **Real Devices:** Although this dashboard has been designed to integrate with real devices, the step-by-step tutorial to do this is left for a future exercise.
 
-**Events &amp; Actions**
+**Reacting to readings**
 
-- PubNub's "[Events &amp; Actions](https://www.pubnub.com/docs/functions/events-and-actions)" feature allows you to listen for specific, configurable events and take the appropriate action such as invoking a webhook or [PubNub Function](https://www.pubnub.com/docs/functions/overview).  Events &amp; Actions are ideal for IoT use cases, for example alerting the dashboard if a temperature sensor indicates food is stored above an acceptable temperature, the person monitoring the dashboard could then take immediate action to resolve the situation.
-- This demo does not include Events &amp; Actions but this is left for a future exercise.
+- A [PubNub Function](https://www.pubnub.com/docs/message-processing/serverless/overview) can check every reading as it's published, for example to alert the person watching the dashboard when a freezer gets too warm.
+- This demo does not include a Function; this is left for a future exercise.
