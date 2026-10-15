@@ -10,12 +10,12 @@ function editDevice (target) {
       document.getElementById('editModal'),
       {}
     )
-    document.getElementById('editModalTitle').innerHTML =
+    document.getElementById('editModalTitle').textContent =
       'Edit Device: ' + iotDevices[deviceId].name
-    document.getElementById('editModalDeviceId').innerHTML = deviceId
+    document.getElementById('editModalDeviceId').textContent = deviceId
     document.getElementById('editModalDeviceName').value =
       iotDevices[deviceId].name
-    document.getElementById('editModalIntervalRangeLabel').innerHTML =
+    document.getElementById('editModalIntervalRangeLabel').textContent =
       'Sensor Reporting Interval: ' +
       iotDevices[deviceId].sensors[0].sensor_update_frequency / 1000 +
       's'
@@ -57,7 +57,7 @@ function editDevice (target) {
 }
 
 function UpdateEditModalIntervalRangeLabel () {
-  document.getElementById('editModalIntervalRangeLabel').innerHTML =
+  document.getElementById('editModalIntervalRangeLabel').textContent =
     'Sensor Reporting Interval: ' +
     document.getElementById('editModalIntervalRange').value / 1000 +
     's'
@@ -71,13 +71,6 @@ async function rebootDevice (deviceId) {
     }
   })
 
-  //  DEMO: used by the interactive demo
-  actionCompleted({
-    action: 'Reboot any device (it will go offline briefly)',
-    debug: false
-  })
-  //  END DEMO: used by the interactive demo
-
   $('#editModal').modal('hide')
 }
 
@@ -89,10 +82,6 @@ async function updateFirmware (deviceId, firmwareFileName, firmwareFile) {
       file: firmwareFile
     })
 
-    //  DEMO: used by the interactive demo
-    actionCompleted({ action: 'Update any device firmware', debug: false })
-    //  END DEMO: used by the interactive demo
-
     $('#editModal').modal('hide')
   }
 }
@@ -103,7 +92,7 @@ async function editModalSaveChanges (args) {
   var newSensorUpdateFrequency = document.getElementById(
     'editModalIntervalRange'
   ).value
-  var deviceId = document.getElementById('editModalDeviceId').innerHTML
+  var deviceId = document.getElementById('editModalDeviceId').textContent
   await pubnub.publish({
     channel: iotDevices[deviceId].channelName,
     message: {
@@ -114,19 +103,6 @@ async function editModalSaveChanges (args) {
       }
     }
   })
-
-  //  DEMO: used by the interactive demo
-  if (newSensorUpdateFrequency == '60000')
-    actionCompleted({
-      action: 'Modify any sensor reporting interval to 60 seconds',
-      debug: false
-    })
-  if (newDeviceName.toLowerCase() === 'fred')
-    actionCompleted({
-      action: "Change the name of any device to 'Fred'",
-      debug: false
-    })
-  //  END DEMO: used by the interactive demo
 
   $('#editModal').modal('hide')
 }
@@ -146,12 +122,8 @@ async function deleteDevice (target) {
     if (iotDevices[deviceId].worker != null)
       iotDevices[deviceId].worker.terminate() //  Should really wait until we get the status message to say the client is disconnected but this is only for the simulator.
     removeRegisteredDevice(deviceId)
-    iotDevices[deviceId].marker.setMap(null)
-    populateSelectedDeviceTable(null, false)
+    removeMapMarker(deviceId)
+    populateSelectedDeviceTable(null)
     iotDevices[deviceId] = null
-
-    //  DEMO: used by the interactive demo
-    actionCompleted({ action: 'Delete a device', debug: false })
-    //  END DEMO: used by the interactive demo
   }
 }

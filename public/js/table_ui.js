@@ -3,63 +3,70 @@
  */
 
 function updateRegisteredDevice (deviceId) {
-  var li_old = document.getElementById(deviceId)
-
-  var li = document.createElement('li')
-  li.setAttribute('class', 'list-group-item small cursor-hand')
-  li.setAttribute('id', deviceId)
-  li.innerHTML = registeredDeviceRow(deviceId)
-  li_old.replaceWith(li)
+  document.getElementById(deviceId).replaceWith(registeredDeviceRow(deviceId))
 }
 
 function addRegisteredDevice (deviceId) {
-  var ul = document.getElementById('registeredDevicesList')
-  var li = document.createElement('li')
-  li.setAttribute('class', 'list-group-item small cursor-hand')
-
-  li.setAttribute('id', deviceId)
-  li.innerHTML = registeredDeviceRow(deviceId, li)
-  ul.appendChild(li)
+  document.getElementById('registeredDevicesList').appendChild(registeredDeviceRow(deviceId))
 }
 
 function removeRegisteredDevice (deviceId) {
-  var ul = document.getElementById('registeredDevicesList')
-  var li = document.getElementById(deviceId)
-  ul.removeChild(li)
+  document.getElementById(deviceId).remove()
 }
 
+//  One row of the Registered Devices list: name, 'Moving' badge, online status and the edit icon.
+//  Built with createElement and textContent, so a device name can't inject HTML.
 function registeredDeviceRow (deviceId) {
-  var editIcon =
-    "<span style='float:right'><H5><a href='javascript:editDevice(\"" +
-    deviceId +
-    "\")' style='color:black'><i class='fa-regular fa-pen-to-square'></i></H5></span>"
-  var html = ''
-  var mobile = ''
-  if (iotDevices[deviceId].mobile === true) {
-    mobile = "<span class='badge rounded-pill custom-bubble'>Moving</span>"
+  const device = iotDevices[deviceId]
+  const online = device.online === 'yes'
+  const li = document.createElement('li')
+  li.setAttribute('class', 'list-group-item small cursor-hand')
+  li.setAttribute('id', deviceId)
+  li.append(device.name + ' ')
+
+  const status = document.createElement('span')
+  status.style.cssText = `color:${online ? 'green' : 'gray'};float:right;margin-right:5px`
+  status.title = online ? 'Device is Online' : 'Device is Offline'
+  if (device.mobile === true) {
+    const badge = document.createElement('span')
+    badge.className = 'badge rounded-pill custom-bubble'
+    badge.textContent = 'Moving'
+    status.append(badge, ' ')
   }
-  var presence = ''
-  if (iotDevices[deviceId].online === 'yes') {
-    presence +=
-      "<span style='color:green;float:right;margin-right:5px' data-bs-toggle='tooltip' data-bs-placement='right' title='Device is Online'>" + mobile + " <i class='fa-solid fa-circle'></i>&nbsp;&nbsp;" + editIcon + "</span>"
-  } else {
-    presence +=
-      "<span style='color:gray;float:right;margin-right:5px' data-bs-toggle='tooltip' data-bs-placement='right' title='Device is Offline'>" + mobile + " <i class='fa-regular fa-circle'></i>&nbsp;&nbsp;" + editIcon + "</span>"
-  }
-  html += iotDevices[deviceId].name + ' '
-  //html += editIcon + ''
-  html += presence + ''
-  return html
+  status.append(icon(online ? 'fa-solid fa-circle' : 'fa-regular fa-circle'), '\u00a0\u00a0')
+
+  const edit = document.createElement('a')
+  edit.href = '#'
+  edit.style.color = 'black'
+  edit.title = 'Edit device'
+  edit.addEventListener('click', event => {
+    event.preventDefault()
+    editDevice(deviceId)
+  })
+  edit.append(icon('fa-regular fa-pen-to-square'))
+  const editHeading = document.createElement('h5')
+  editHeading.style.float = 'right'
+  editHeading.append(edit)
+  status.append(editHeading)
+
+  li.append(status)
+  return li
+}
+
+function icon (className) {
+  const i = document.createElement('i')
+  i.className = className
+  return i
 }
 
 function registeredDeviceRow_click (e) {
   if (e !== null && e.target !== null && iotDevices[e.target.id]) {
-    populateSelectedDeviceTable(e.target.id, true)
+    populateSelectedDeviceTable(e.target.id)
     focusOnMarker(e.target.id)
   }
 }
 
-function populateSelectedDeviceTable (deviceId, manuallyInvoked) {
+function populateSelectedDeviceTable (deviceId) {
   if (selectedId != null && deviceId != null) {
     iotDevices[selectedId].selected = false
   }
@@ -69,49 +76,28 @@ function populateSelectedDeviceTable (deviceId, manuallyInvoked) {
     iotDevices[deviceId].selected = true
   }
 
-  if (manuallyInvoked) {
-    //  DEMO: used by the interactive demo
-    if (
-      deviceId != null &&
-      iotDevices[deviceId].name == 'Victoria Falls Wind Speed'
-    )
-      actionCompleted({
-        action: 'View the Victoria falls windspeed',
-        debug: false
-      })
-    if (
-      deviceId != null &&
-      iotDevices[deviceId].name == 'EU Freezer Truck'
-    )
-      actionCompleted({
-        action: 'Find the European freezer truck',
-        debug: false
-      })
-    //  END used by interactive demo
-  }
-
-  document.getElementById('selected-name').innerHTML =
+  document.getElementById('selected-name').textContent =
     deviceId != null ? '' + iotDevices[deviceId].name : 'Selected: '
-  document.getElementById('selected-id').innerHTML =
+  document.getElementById('selected-id').textContent =
     deviceId != null ? '' + deviceId : ''
-  document.getElementById('selected-channel-name').innerHTML =
+  document.getElementById('selected-channel-name').textContent =
     deviceId != null ? '' + iotDevices[deviceId].channelName : ''
   if (deviceId == null || iotDevices[deviceId].lat == 0) {
-    document.getElementById('selected-location').innerHTML =
+    document.getElementById('selected-location').textContent =
       'Location: Not yet seen'
   } else {
-    document.getElementById('selected-location').innerHTML =
+    document.getElementById('selected-location').textContent =
       'Location: [' +
       iotDevices[deviceId].lat +
       ', ' +
       iotDevices[deviceId].long +
       ']'
   }
-  document.getElementById('selected-sensor-name').innerHTML =
+  document.getElementById('selected-sensor-name').textContent =
     deviceId != null
       ? 'Sensor: ' + iotDevices[deviceId].sensors[0].sensor_name
       : 'Sensor: '
-  document.getElementById('selected-sensor-value').innerHTML =
+  document.getElementById('selected-sensor-value').textContent =
     deviceId != null
       ? 'Reading: ' +
         iotDevices[deviceId].sensors[0].sensor_value +
@@ -122,19 +108,19 @@ function populateSelectedDeviceTable (deviceId, manuallyInvoked) {
     deviceId == null ||
     iotDevices[deviceId].sensors[0].sensor_update_frequency == 0
   ) {
-    document.getElementById('selected-sensor-update-frequency').innerHTML =
+    document.getElementById('selected-sensor-update-frequency').textContent =
       'Update Frequency: Not yet seen'
   } else {
-    document.getElementById('selected-sensor-update-frequency').innerHTML =
+    document.getElementById('selected-sensor-update-frequency').textContent =
       'Update Frequency: ' +
       iotDevices[deviceId].sensors[0].sensor_update_frequency / 1000 +
       's'
   }
-  document.getElementById('selected-last-seen').innerHTML =
+  document.getElementById('selected-last-seen').textContent =
     deviceId != null
       ? 'Last Seen: ' + formatDate(iotDevices[deviceId].sensors[0].sensor_lastupdate)
       : 'Last Seen:'
-  document.getElementById('selected-firmware').innerHTML =
+  document.getElementById('selected-firmware').textContent =
     deviceId != null
       ? 'Firmware: ' + iotDevices[deviceId].firmware_version
       : 'Firmware:'

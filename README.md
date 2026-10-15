@@ -11,7 +11,7 @@ This IoT dashboard shows how an IoT solution managed by PubNub might look - remo
 
 ## Demo
 
-A hosted version of this demo can be found at https://www.pubnub.com/demo/iot-dashboard/
+A hosted version of this demo can be found at https://www.pubnub.com/demos/iot-dashboard/
 
 ## Features
 
@@ -24,7 +24,9 @@ A hosted version of this demo can be found at https://www.pubnub.com/demo/iot-da
 
 This dashboard uses Node, npm and express to show how a PubNub IoT dashboard might look.  For ease of use, devices are simulated but please see [PubNub.com](http://www.pubnub.com) for previous blogs on integrating real IoT hardware such as Arduino and Raspberry Pi.
 
-To run this project yourself you will need a PubNub account and, optionally, a Google Maps API key.
+To run this project yourself you need a free PubNub account. The map uses [Leaflet](https://leafletjs.com/) with [OpenStreetMap](https://www.openstreetmap.org/) tiles, so it needs no API key.
+
+Tested with the PubNub JavaScript SDK 13.1.2 and Node.js 22 (October 2026).
 
 ### Requirements
 - [Node.js](https://nodejs.org/en/)
@@ -37,54 +39,33 @@ To run this project yourself you will need a PubNub account and, optionally, a G
 
 ### Get Your PubNub Keys
 
-1. You’ll first need to sign up for a [PubNub account](https://dashboard.pubnub.com/signup/). Once you sign up, you can get your unique PubNub keys from the [PubNub Developer Portal](https://admin.pubnub.com/).
+1. Sign in to the [Admin Portal](https://admin.pubnub.com/) or [create a free account](https://admin.pubnub.com/signup).
+1. Go to **Apps & Keysets**, click **Create app** and give it a name.
+1. Open the app and click **Create keyset**. Enter a name, keep the environment on **Testing** and click **Next**.
+1. Presence and File Sharing are already on. Under **Presence**, choose **All channels**, then click **Create**. With the default, **Selected channels only**, the dashboard never sees devices go online or offline until you add a Presence rule for the `device.*` channels.
+1. Copy the **Publish key** and the **Subscribe key**.
 
-1. Sign in to your [PubNub Dashboard](https://admin.pubnub.com/).
-
-1. Click Apps, then **Create New App**.
-
-1. Give your app a name, and click **Create**.
-
-1. Click your new app to open its settings, then click its keyset.
-
-1. Enable the Presence feature for your keyset.
-
-1. Enable the Stream Controller feature for your keyset.
-
-1. Enable the Files feature for your keyset.
-
-1. Copy the Publish and Subscribe keys and paste them into your app as specified in the next step.
+You can also create the keyset from your AI coding tool with the [PubNub MCP Server](https://www.pubnub.com/docs/ai-development/set-up-mcp-server).
 
 ### Building and Running
 
-1. You'll need to run the following commands from your terminal.
-
-1. Clone the GitHub repository.
+1. Clone the repository:
 
 	```bash
 	git clone https://github.com/PubNubDevelopers/iot-dashboard-javascript-demo.git
-	```
-1. Navigate to the application directory.
-
-	```bash
 	cd iot-dashboard-javascript-demo
 	```
 
-1. Add your pub/sub keys to `/public/js/keys.js`
+1. Open `public/js/keys.js` and replace `YOUR_PUBLISH_KEY` and `YOUR_SUBSCRIBE_KEY` with your keys.
 
-1. (optional) Add your Google Maps API key which supports the JS Maps API to `public/js/keys.js`.  See 'Using your own Google Maps API key', below.
-
-1. Install dependencies.
+1. Install the dependencies and start the server:
 
 	```bash
 	npm install
+	npm start
 	```
 
-1. Run the application: 
-
-	```bash
-	npm run start
-	```
+1. Open http://localhost:8001 in your browser. The page needs this server, not `file://`, because the simulated devices run as web workers.
 
 ## Contributing
 Please fork the repository if you'd like to contribute. Pull requests are always welcome. 
@@ -100,17 +81,11 @@ Checkout the following lins for more information on developing IoT solutions wit
 - IoT customers and case studies: https://www.pubnub.com/industry/iot-and-connected-devices/
 - IoT PubNub developer path: https://www.pubnub.com/developers/internet-of-things-developer-path/
 
-## Using your own Google Maps API key
-
-This project comes with a provided Maps key for ease of setup but should that key be subject to abuse and blocked by Google, you can provide your own as a workaround.
-
-The steps to do this are as follows:
-
-1. Visit https://developers.google.com/maps/documentation/javascript/get-api-key and follow the instructions to create a project and API keys
-1. Make sure you have the following APIs enabled: 'Maps Embed API', 'Maps JavaScript API'.  Both of these are free.
-1. Add your Google Maps API key to `public/js/keys.js`.
-
 ## Architectural Notes, Next Steps and Future Work
+
+**Map tiles**
+
+The map uses OpenStreetMap's tile servers, which are fine for a demo with a few users. They aren't meant for heavy use ([tile usage policy](https://operations.osmfoundation.org/policies/tiles/)), so in production use a tile provider.
 
 **A Note about Signals**
 
@@ -123,7 +98,7 @@ This demo has been built to be expanded in the future to handle real IoT devices
 
 **Message Persistence:**
 
-- For ease of use, this demo lacks any kind of serverside message persistence.  Most customers deploying an IoT solution with PubNub to production will choose to use **[PubNub App Context](https://www.pubnub.com/docs/sdks/javascript/api-reference/objects)** to store attributes of the device.  This is analogous to a 'device shadow' in AWS or 'twin device' in Azure.
+- For ease of use, this demo lacks any kind of serverside message persistence.  In production you would store the attributes of each device on PubNub with **[DataSync](https://www.pubnub.com/docs/data-storage/structured-data/overview)** (which needs [Access Manager](https://www.pubnub.com/docs/security/access-control/overview)) or in your own database.  This is analogous to a 'device shadow' in AWS or 'twin device' in Azure.
 - Because entities are only stored locally, if you refresh the page you will lose any created simulators.  **This is a limitation of the demo, not a limitation of PubNub**.
 - You will also see this if you open multiple instances of this application in different browser tabs.  Any device (simulator) you create will only have its messages subscribed to by the tab in which you created the device.
 

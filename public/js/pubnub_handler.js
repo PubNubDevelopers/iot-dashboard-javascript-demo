@@ -1,78 +1,92 @@
 /**
- * Main entry point for communication coming from PubNub
- * The internal state of the application is managed by the 'iotDevices' object.
- * This is designed to show the principle of what IoT with PubNub would look like - obviously storing these entities as part of the client app state does not lend itself to multiple clients viewing the same simulated device(!).  PubNub App Context would be a good approach to managing your IoT devices on the server - see the ReadMe for more information.
- * Note: I used an auto-formatter on this code but I'm not sure I like how it turned out.
+ * Main entry point for communication coming from PubNub.
+ * The state of the dashboard is in the 'iotDevices' object, one entry per device ID.
+ * This shows the principle of an IoT dashboard on PubNub. Keeping devices in the browser doesn't let several
+ * dashboards share them; see the ReadMe for how you would store devices on the server.
  */
 
 var pubnub = null
 var iotDevices = null
 var selectedId = null
+var simulatorsStarted = false
 
-async function onload () {
+function onload () {
   iotDevices = {}
+  initializeMap()
   if (!testPubNubKeys()) {
     document.getElementById('noKeysAlert').style.display = 'block'
-  } else {
-    pubnub = await createPubNubObject()
-    await pubnub.addListener({
-      //  Status events
-      status: async statusEvent => {
-        //  Channel subscription is now complete, pre-populate with simulators.
-        //console.log(statusEvent)
-        if (statusEvent.affectedChannels[0] === 'device.*') {
-          initializeSimulators()
-        }
-      },
-      //  Messages from remote IOT devices.  Update the internal object that stores information about all these devices
-      message: async payload => {
-        if (
-          iotDevices[payload.publisher] == null ||
-          payload.publisher === pubnub.uuid
-        )
-          return
-
-        //console.log(payload)
-        var nameChanged =
-          iotDevices[payload.publisher].name != payload.message.friendly_name
-        iotDevices[payload.publisher].name = payload.message.friendly_name
-        iotDevices[payload.publisher].lat = payload.message.lat
-        iotDevices[payload.publisher].long = payload.message.long
-        iotDevices[payload.publisher].sensors[0].sensor_name =
-          payload.message.sensors[0].sensor_name
-        iotDevices[payload.publisher].sensors[0].sensor_value =
-          Math.round(
-            (payload.message.sensors[0].sensor_value + Number.EPSILON) * 100
-          ) / 100
-        iotDevices[payload.publisher].sensors[0].sensor_update_frequency =
-          payload.message.sensors[0].sensor_update_frequency
-        iotDevices[payload.publisher].sensors[0].sensor_units =
-          payload.message.sensors[0].sensor_units
-        iotDevices[payload.publisher].sensors[0].sensor_lastupdate = new Date(
-          payload.timetoken / 10000
-        )
-        iotDevices[payload.publisher].firmware_version =
-          payload.message.firmware_version
-        moveMapMarker(payload.publisher, populateSelectedDeviceTable)
-        if (iotDevices[payload.publisher].selected)
-          populateSelectedDeviceTable(payload.publisher, false)
-        if (nameChanged) updateRegisteredDevice(payload.publisher, false)
-      },
-      presence: presenceEvent => {
-        //  Will be invoked regardless of the 'Announce Max' setting on the key
-        if (iotDevices[presenceEvent.uuid]) {
-          if (presenceEvent.action === 'join')
-            iotDevices[presenceEvent.uuid].online = 'yes'
-          else iotDevices[presenceEvent.uuid].online = 'no'
-          updateRegisteredDevice(presenceEvent.uuid)
-        }
+    return
+  }
+  pubnub = createPubNubObject()
+  pubnub.addListener({
+    status: statusEvent => {
+      //  The subscription to all device channels is up, so start the simulated devices.
+      if (statusEvent.category === 'PNConnectedCategory' && !simulatorsStarted) {
+        simulatorsStarted = true
+        initializeSimulators()
       }
-    })
+    }
+  })
 
-    //  Wildcard subscribe, to listen for all devices in a scalable manner
-    pubnub.subscribe({
-      channels: ["device.*"],
-      withPresence: true
-    })
+  //  Wildcard subscribe: one subscription gets messages and presence events from every device.* channel.
+  const subscription = pubnub.channel('device.*').subscription({ receivePresenceEvents: true })
+
+  //  Sensor readings from the devices. Update the stored device, the map and the tables.
+  subscription.onMessage = event => {
+    const device = iotDevices[event.publisher]
+    const reading = readDeviceMessage(event.message)
+    if (!device || !reading) return
+    const nameChanged = device.name !== reading.name
+    device.name = reading.name
+    device.lat = reading.lat
+    device.long = reading.long
+    Object.assign(device.sensors[0], reading.sensor)
+    device.sensors[0].sensor_lastupdate = new Date(Number(event.timetoken) / 10000) //  A timetoken counts 100-nanosecond intervals.
+    device.firmware_version = reading.firmwareVersion
+    moveMapMarker(event.publisher, populateSelectedDeviceTable)
+    if (device.selected) populateSelectedDeviceTable(event.publisher)
+    if (nameChanged) updateRegisteredDevice(event.publisher)
+  }
+
+  //  A device is online while it's subscribed to its channel: join means online, leave or timeout means offline.
+  subscription.onPresence = event => {
+    if (event.action === 'interval') { //  On busy channels PubNub batches joins and leaves into interval events.
+      ;(event.join || []).forEach(id => setOnline(id, true))
+      ;[...(event.leave || []), ...(event.timeout || [])].forEach(id => setOnline(id, false))
+    } else if (event.action === 'join') {
+      setOnline(event.uuid, true)
+    } else if (event.action === 'leave' || event.action === 'timeout') {
+      setOnline(event.uuid, false)
+    }
+  }
+
+  subscription.subscribe()
+}
+
+function setOnline (deviceId, online) {
+  if (!iotDevices[deviceId]) return
+  iotDevices[deviceId].online = online ? 'yes' : 'no'
+  updateRegisteredDevice(deviceId)
+}
+
+//  Anyone with your keys can publish on the device channels, so only accept readings with the expected shape.
+function readDeviceMessage (message) {
+  if (!message || typeof message !== 'object' || !Array.isArray(message.sensors) || !message.sensors[0]) return null
+  const sensor = message.sensors[0]
+  const lat = Number(message.lat)
+  const long = Number(message.long)
+  const value = Number(sensor.sensor_value)
+  if (!Number.isFinite(lat) || !Number.isFinite(long) || !Number.isFinite(value)) return null
+  return {
+    name: String(message.friendly_name ?? '').substring(0, 40),
+    lat,
+    long,
+    firmwareVersion: String(message.firmware_version ?? 'Unknown').substring(0, 60),
+    sensor: {
+      sensor_name: String(sensor.sensor_name ?? ''),
+      sensor_value: Math.round((value + Number.EPSILON) * 100) / 100,
+      sensor_update_frequency: Number(sensor.sensor_update_frequency) || 0,
+      sensor_units: String(sensor.sensor_units ?? '')
+    }
   }
 }

@@ -1,76 +1,42 @@
 /**
- * Logic to handle drawing the map and the markers.
+ * Draws the map and one marker per device with Leaflet and OpenStreetMap tiles. No API key needed.
  */
 
 var map = null
 
-var initialize = function () {
-  var myLatlng = new google.maps.LatLng(37.7749, 0.0)
-  map = new google.maps.Map(document.getElementById('map-canvas'), {
-    zoom: 2,
-    minZoom: 2,
-    center: myLatlng,
-    streetViewControl: false
-  })
-
-  //  This toggleBounce function is not used but would be good to indicate that a new event has occured at the device, e.g. overheat or air quality below a certain threshold.
-  function toggleBounce (marker) {
-    if (marker.getAnimation() !== null) {
-      marker.setAnimation(null)
-    } else {
-      marker.setAnimation(google.maps.Animation.BOUNCE)
-    }
-  }
+function initializeMap () {
+  map = L.map('map-canvas', { minZoom: 2, worldCopyJump: true }).setView([37.7749, 0.0], 2)
+  //  OpenStreetMap's tile servers are fine for a tutorial. For production, use a tile provider: see the tutorial.
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map)
 }
 
 function focusOnMarker (deviceId) {
   if (iotDevices[deviceId].marker != null) {
-    map.setZoom(10)
-    map.setCenter(iotDevices[deviceId].marker.getPosition())
+    map.setView(iotDevices[deviceId].marker.getLatLng(), 10)
   }
   populateSelectedDeviceTable(deviceId)
 }
 
 function focusOnLatLong (latitude, longitude) {
-  map.setZoom(10)
-  map.setCenter({ lat: latitude, lng: longitude })
+  map.setView([latitude, longitude], 10)
 }
 
 function moveMapMarker (deviceId, populateSelectedDeviceTable) {
-  const iconBase =
-    'https://developers.google.com/maps/documentation/javascript/examples/full/images/'
-  var theAnimation = null
-  if (iotDevices[deviceId].marker == null)
-    theAnimation = google.maps.Animation.DROP
-
-  if (iotDevices[deviceId].marker == null) {
-    iotDevices[deviceId].marker = new google.maps.Marker({
-      map,
-      custom_id: '123',
-      draggable: false,
-      animation: theAnimation,
-      position: {
-        lat: iotDevices[deviceId].lat,
-        lng: iotDevices[deviceId].long
-      }
-    })
-    iotDevices[deviceId].marker.addListener('click', () => {
-      map.setZoom(10)
-      map.setCenter(iotDevices[deviceId].marker.getPosition())
-      populateSelectedDeviceTable(deviceId, true)
-
-      //  DEMO: used by the interactive demo
-      actionCompleted({ action: 'Click on a map marker', debug: false })
-      //  END DEMO: used by the interactive demo
+  const device = iotDevices[deviceId]
+  if (device.marker == null) {
+    device.marker = L.marker([device.lat, device.long]).addTo(map)
+    device.marker.on('click', () => {
+      map.setView(device.marker.getLatLng(), 10)
+      populateSelectedDeviceTable(deviceId)
     })
   } else {
-    //  Move the existing marker
-    iotDevices[deviceId].marker.setPosition({
-      lat: iotDevices[deviceId].lat,
-      lng: iotDevices[deviceId].long
-    })
-    //map.setCenter(iotDevices[deviceId].marker.getPosition());
+    device.marker.setLatLng([device.lat, device.long])
   }
 }
 
-window.initialize = initialize
+function removeMapMarker (deviceId) {
+  if (iotDevices[deviceId].marker != null) iotDevices[deviceId].marker.remove()
+}

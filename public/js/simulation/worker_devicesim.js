@@ -4,8 +4,7 @@
  */
 
 if ('function' === typeof importScripts) {
-  const window = null
-  importScripts('https://cdn.pubnub.com/sdk/javascript/pubnub.7.2.2.min.js')
+  importScripts('https://cdn.pubnub.com/sdk/javascript/pubnub.13.1.2.min.js')
   importScripts('./simulator_types.js')
 
   var deviceSimulator
@@ -15,6 +14,8 @@ if ('function' === typeof importScripts) {
   var type
   var route
   var localPubNub
+  var subscription
+  var provisioned = false
   var lat
   var long
   var tick = 0
@@ -46,52 +47,44 @@ if ('function' === typeof importScripts) {
       localPubNub = new PubNub({
         publishKey: pubKey,
         subscribeKey: subKey,
-        uuid: id,
+        userId: id, //  The device ID is the User ID, so presence events tell the dashboard which device joined or left.
         listenToBrowserNetworkEvents: false //  Allows us to call the PubNub SDK from a web worker
       })
-      var accessManagerToken = await requestAccessManagerToken(id)
-      if (accessManagerToken == null)
-      {
-        console.log('Error retrieving access manager token')
-      }
-      else{
-        localPubNub.setToken(accessManagerToken)
-      }
 
-      await localPubNub.addListener({
-        status: async statusEvent => {
-          //console.log(statusEvent)
-          this.postMessage({
-            command: 'provisionComplete',
-            values: { deviceId: id }
-          })
-        },
-        message: async payload => {
-          if (payload.publisher !== id) {
-            if (payload.message.action === 'reboot') {
-              deviceSimulator.reboot()
-            } else if (payload.message.action === 'stop') {
-              deviceSimulator.stop()
-            } else if (payload.message.action === 'update') {
-              deviceSimulator.setName(payload.message.params.deviceName)
-              deviceSimulator.changeIntervalValue(
-                payload.message.params.sensorUpdateFrequency
-              )
-            }
-          }
-        },
-        file: async payload => {
-          if (payload.publisher !== id) {
-            //  Only file we handle is firmware
-            deviceSimulator.updateFirmware(payload.file.name)
+      localPubNub.addListener({
+        status: statusEvent => {
+          if (statusEvent.category === 'PNConnectedCategory' && !provisioned) {
+            provisioned = true
+            this.postMessage({
+              command: 'provisionComplete',
+              values: { deviceId: id }
+            })
           }
         }
       })
 
-      await localPubNub.subscribe({
-        channels: [deviceChannelName],
-        withPresence: false
-      })
+      //  The device listens on its own channel for commands and firmware files from the dashboard.
+      subscription = localPubNub.channel(deviceChannelName).subscription()
+      subscription.onMessage = payload => {
+        if (payload.publisher === id || !payload.message) return
+        if (payload.message.action === 'reboot') {
+          deviceSimulator.reboot()
+        } else if (payload.message.action === 'stop') {
+          deviceSimulator.stop()
+        } else if (payload.message.action === 'update' && payload.message.params) {
+          deviceSimulator.setName(payload.message.params.deviceName)
+          deviceSimulator.changeIntervalValue(
+            payload.message.params.sensorUpdateFrequency
+          )
+        }
+      }
+      subscription.onFile = payload => {
+        if (payload.publisher !== id) {
+          //  Only file we handle is firmware
+          deviceSimulator.updateFirmware(payload.file.name)
+        }
+      }
+      subscription.subscribe()
 
       deviceSimulator = new DeviceSimulator(
         defaultDeviceName,
@@ -252,26 +245,25 @@ if ('function' === typeof importScripts) {
     }
 
     setName (name) {
-      this.deviceName = name
+      this.deviceName = String(name ?? '').substring(0, 40) || this.deviceName
     }
 
     changeIntervalValue (newInterval) {
+      const interval = Number(newInterval)
+      if (!Number.isFinite(interval) || interval < 1000 || interval > 60000) return //  1 to 60 seconds, as in the dashboard.
       this.stop()
-      this.interval = newInterval
+      this.interval = interval
       this.start()
     }
 
     async reboot () {
       this.stop()
-      await localPubNub.unsubscribe({ channels: [deviceChannelName] })
+      subscription.unsubscribe() //  The dashboard gets a leave event and shows the device offline.
       setTimeout(this.postReboot, 5000, this)
     }
 
     async postReboot (deviceSimulator) {
-      await localPubNub.subscribe({
-        channels: [deviceChannelName],
-        withPresence: false
-      })
+      subscription.subscribe() //  Back online: the dashboard gets a join event.
       deviceSimulator.start()
     }
 
@@ -332,27 +324,6 @@ if ('function' === typeof importScripts) {
       })
 
       tick++
-    }
-  }
-
-  async function requestAccessManagerToken (userId) {
-    try {
-      const TOKEN_SERVER = 'https://devrel-demos-access-manager.netlify.app/.netlify/functions/api/iotdemo'
-      const response = await fetch(`${TOKEN_SERVER}/grant`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ UUID: userId })
-      })
-  
-      const token = (await response.json()).body.token
-      //console.log('created token: ' + token)
-  
-      return token
-    } catch (e) {
-      console.log('failed to create token ' + e)
-      return null
     }
   }
 }

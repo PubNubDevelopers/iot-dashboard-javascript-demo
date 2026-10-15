@@ -22,14 +22,14 @@ function createNewDevice () {
   //  Assign a random ID
   var newId = makeid(8)
   var idPlaceholder = document.getElementById('createModalDeviceId')
-  idPlaceholder.innerHTML = newId
+  idPlaceholder.textContent = newId
 
   //  Populate sensor types
   if (selectSensorType.options.length === 1) {
     for (sensor in SensorType) {
       var option = document.createElement('option')
       option.value = SensorType[sensor]
-      option.innerHTML = SensorType[sensor]
+      option.textContent = SensorType[sensor]
       selectSensorType.appendChild(option)
     }
   }
@@ -40,7 +40,7 @@ function createNewDevice () {
     for (route in Routes) {
       var option = document.createElement('option')
       option.value = route
-      option.innerHTML = Routes[route].description
+      option.textContent = Routes[route].description
       selectRoute.appendChild(option)
     }
   }
@@ -64,7 +64,7 @@ async function createModalCreateDevice () {
     return
   }
 
-  var deviceId = document.getElementById('createModalDeviceId').innerHTML
+  var deviceId = document.getElementById('createModalDeviceId').textContent
 
   var selectSensorType = document.getElementById('createModalSelectSensorType')
   if (selectSensorType.selectedIndex == 0) {
@@ -121,26 +121,7 @@ async function createModalCreateDevice () {
   })
   iotDevices[deviceId].worker.postMessage({ action: 'start' })
   focusOnLatLong(inDeviceLat, inDeviceLong)
-  populateSelectedDeviceTable(deviceId, true)
-
-  //  DEMO: used by the interactive demo
-  if (
-    Routes[selectRoute.value].fileName == Routes['Eur3'].fileName &&
-    selectSensorType.value == SensorType['FreezerTemperature']
-  )
-    actionCompleted({
-      action: 'Create a mobile freezer temperature sensor, starting in Warsaw',
-      debug: false
-    })
-  if (
-    Routes[selectRoute.value].fileName == Routes['USA2'].fileName &&
-    selectSensorType.value == SensorType['Air_Pollution']
-  )
-    actionCompleted({
-      action: 'Create a mobile air pollution sensor, starting in Dallas',
-      debug: false
-    })
-  //  END DEMO: used by the interactive demo
+  populateSelectedDeviceTable(deviceId)
 
   $('#createModal').modal('hide')
 }

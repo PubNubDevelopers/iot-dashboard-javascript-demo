@@ -22,8 +22,14 @@
         })
     </script>
 
+    <!-- Map: Leaflet with OpenStreetMap tiles -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
     <!-- PubNub SDK -->
-    <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.7.2.2.min.js"></script>
+    <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.13.1.2.min.js"></script>
 
     <!-- Application logic -->
     <script src="./js/keys.js"></script>
@@ -32,12 +38,7 @@
     <script src="./js/simulation/simulation.js"></script>
     <script src="./js/simulation/simulator_types.js"></script>
     <script src="./js/pubnub_setup.js"></script>
-
-    <!-- Interactive Demo Framework -->
-    <script type="text/javascript" src="https://darryncampbell-pubnub.github.io/pubnub-demo-utils/js/interactive-demo-interface/v1/demo-interface.js"></script>
 </head>
-
-<!-- Interactive demo hosts this content in a window 824 pixels wide -->
 
 <body id="body" onload="onload();">
     <!--script src="/reload/reload.js"></script-->
@@ -75,7 +76,7 @@
                 <!-- <H1>PubNub IoT Demo</H1> -->
                 <div class="alert alert-primary align-items-center mt-3" id="loadWarning" role="alert">
                     <div class="text-center fs-4">
-                        Clearing previous devices. Creating simulated Devcies
+                        Creating simulated devices
                         <div class="spinner-border float-end" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
@@ -84,11 +85,11 @@
             </div>
         </div>
 
-        <!-- Shown if no PubNub keys found in setup.js -->
+        <!-- Shown if no PubNub keys are set in keys.js -->
         <div class="container alert alert-danger alert-dismissible fade show" style="display:none" id="noKeysAlert"
             role="alert">
             <i class="fa-solid fa-triangle-exclamation"></i>
-            <strong>Cannot find PubNub keys.</strong> Please specify your PubNub keys in pubnub_setup.js.
+            <strong>Cannot find PubNub keys.</strong> Please set your PubNub keys in public/js/keys.js.
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
 
@@ -96,7 +97,7 @@
         <div class="container-fluid px-2">
             <div class="row gy-2 px-2">
                 <div class="col-lg-8 col-md-7 px-2">
-                    <div style="height:100%;height: 700px;" id="map-canvas">.</div>
+                    <div style="height: 700px;" id="map-canvas"></div>
                 </div>
                 <div class="col">
                     <div class="row gy-2 px-2">
@@ -312,14 +313,7 @@
     <script src="./js/table_ui.js"></script>
     <script src="./js/map.js"></script>
     <script>
-        //  Map
-        var jsElem = window.document.createElement('script');
-        jsElem.src = "https://maps.googleapis.com/maps/api/js?key=" + GOOGLE_MAP_KEY + "&callback=initialize";
-        jsElem.type = 'text/javascript';
-        document.getElementById('body').append(jsElem);
-
-        //  Load warning about clearing previous devices - see ReadMe for more information on message persistence.
-        var warningMsg = document.getElementById('loadWarning');
+        //  Hide the 'Creating simulated devices' banner after 3 seconds.
         setTimeout(function () {document.getElementById('loadWarning').style.display = "none"}, 3000);
     </script>
 
