@@ -64,12 +64,7 @@ function UpdateEditModalIntervalRangeLabel () {
 }
 
 async function rebootDevice (deviceId) {
-  await pubnub.publish({
-    channel: iotDevices[deviceId].channelName,
-    message: {
-      action: 'reboot'
-    }
-  })
+  await sendCommand(deviceId, { action: 'reboot' })
 
   $('#editModal').modal('hide')
 }
@@ -93,14 +88,11 @@ async function editModalSaveChanges (args) {
     'editModalIntervalRange'
   ).value
   var deviceId = document.getElementById('editModalDeviceId').textContent
-  await pubnub.publish({
-    channel: iotDevices[deviceId].channelName,
-    message: {
-      action: 'update',
-      params: {
-        deviceName: newDeviceName,
-        sensorUpdateFrequency: newSensorUpdateFrequency
-      }
+  await sendCommand(deviceId, {
+    action: 'update',
+    params: {
+      deviceName: newDeviceName,
+      sensorUpdateFrequency: newSensorUpdateFrequency
     }
   })
 
@@ -112,12 +104,7 @@ async function deleteDevice (target) {
   var deviceId = target
   if (deviceId instanceof HTMLLIElement) deviceId = target.id
   if (deviceId != null) {
-    await pubnub.publish({
-      channel: iotDevices[deviceId].channelName,
-      message: {
-        action: 'stop'
-      }
-    })
+    await sendCommand(deviceId, { action: 'stop' })
 
     if (iotDevices[deviceId].worker != null)
       iotDevices[deviceId].worker.terminate() //  Should really wait until we get the status message to say the client is disconnected but this is only for the simulator.

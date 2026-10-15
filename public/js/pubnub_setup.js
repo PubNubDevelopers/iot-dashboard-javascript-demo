@@ -19,9 +19,18 @@ function createPubNubObject () {
     userId: userId
   })
   //  The dashboard sends commands (e.g. 'reboot') on the device channels it listens to.
-  //  This filter tells PubNub not to send the dashboard its own messages back.
-  pubnub.setFilterExpression("uuid != '" + pubnub.getUserId() + "'")
+  //  sendCommand() marks them with meta.sender, and this filter tells PubNub not to send them back to the dashboard.
+  pubnub.setFilterExpression("meta.sender != 'dashboard'")
   return pubnub
+}
+
+//  Send a command to one device, on that device's channel.
+function sendCommand (deviceId, message) {
+  return pubnub.publish({
+    channel: iotDevices[deviceId].channelName,
+    message: message,
+    meta: { sender: 'dashboard' }
+  })
 }
 
 function makeid (length) {
