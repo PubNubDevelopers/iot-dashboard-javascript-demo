@@ -8,6 +8,7 @@
 var pubnub = null
 var iotDevices = null
 var selectedId = null
+var simulatorsInitialized = false
 
 async function onload () {
   iotDevices = {}
@@ -19,8 +20,11 @@ async function onload () {
       //  Status events
       status: async statusEvent => {
         //  Channel subscription is now complete, pre-populate with simulators.
+        //  The SDK reports 'connected' again after it restores the subscription following a network drop,
+        //  so only create the simulators once.
         //console.log(statusEvent)
-        if (statusEvent.affectedChannels[0] === 'device.*') {
+        if (!simulatorsInitialized && statusEvent.affectedChannels[0] === 'device.*') {
+          simulatorsInitialized = true
           initializeSimulators()
         }
       },
