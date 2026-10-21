@@ -28,7 +28,7 @@ async function createPubNubObject (presetUUID) {
   var pubnub = new PubNub({
     publishKey: publish_key,
     subscribeKey: subscribe_key,
-    uuid: UUID
+    userId: UUID
   })
   //  IN PRODUCTION: Replace with your own logic to request an Access Manager token
   var accessManagerToken = await requestAccessManagerToken(UUID)
@@ -41,7 +41,7 @@ async function createPubNubObject (presetUUID) {
     //  between 10 and 60 minutes and refresh the token before it expires.
     //  For simplicity, this app does not refresh the token
   }
-  pubnub.setFilterExpression("uuid != '" + pubnub.getUUID() + "'")
+  pubnub.setFilterExpression("uuid != '" + pubnub.getUserId() + "'")
   return pubnub
 }
 
